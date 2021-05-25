@@ -11,6 +11,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 find_package(glfw3 CONFIG REQUIRED)
 target_link_libraries(pslightdash PRIVATE glfw)
+find_package(jsoncpp CONFIG REQUIRED)
+target_link_libraries(pslightdash PRIVATE jsoncpp_lib jsoncpp_object)
+find_package(OpenSSL REQUIRED)
+target_link_libraries(pslightdash PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
 add_custom_command(TARGET pslightdash PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/res/ $<TARGET_FILE_DIR:pslightdash>/res/)
 

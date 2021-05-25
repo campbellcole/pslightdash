@@ -20,6 +20,7 @@ int main() {
 
   debug("Initialized renderer.");
 
+  /*
   float _v1[] = {
       0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
       0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, -1.0f,
@@ -35,7 +36,8 @@ int main() {
   Renderable *testTriangle1 = new Renderable("test", true);
   testTriangle1->setRegisterFunction(&Renderable::TEXTURED_VAO_REGISTER);
   testTriangle1->setRenderInfo(_v1, 32, _i1, 6);
-  //context->addTarget(testTriangle1);
+  context->addTarget(testTriangle1);
+  */
 
   float _v2[] = {
       1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,//   1.0f,  1.0f,
@@ -58,7 +60,6 @@ int main() {
   renderer->begin();
 
   delete background;
-  delete testTriangle1;
   delete renderer;
   delete context;
 

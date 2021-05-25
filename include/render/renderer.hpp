@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "discordhooker.hpp"
 #include "pslightdash.hpp"
 #include "dbg.h"
 #include "render/program.hpp"

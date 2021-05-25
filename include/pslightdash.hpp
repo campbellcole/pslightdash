@@ -4,9 +4,9 @@
 #include <iostream>
 #include <sstream>
 
+#include "render/renderer.hpp" // must be on top because program includes utils which includes windows.h and httplib must be first
 #include "render/program.hpp"
 #include "render/rendercontext.hpp"
-#include "render/renderer.hpp"
 #include "dbg.h"
 #include "pslightdashconfig.h"
 
@@ -17,5 +17,7 @@
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
+
+int main();
 
 #endif // PSLIGHTDASH_HPP

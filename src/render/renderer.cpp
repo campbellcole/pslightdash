@@ -15,7 +15,16 @@ float lastPress = 0;
 void Renderer::handleInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
-  else if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) // temp
+  else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    if (glfwGetTime() - lastPress > 1.0) {
+      lastPress = glfwGetTime();
+      /*DiscordHooker hooker(
+          [redacted]
+      );
+      hooker.pushToDiscord("sent from WIP c++ code, pretty neat");
+       */
+    }
+  } else if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) // temp
   {
     if (glfwGetTime() - lastPress > 1.0) {
       lastPress = glfwGetTime();

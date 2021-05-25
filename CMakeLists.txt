@@ -16,7 +16,7 @@ add_custom_command(TARGET pslightdash PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy
 
 configure_file("include/pslightdashconfig.h.in" "../include/pslightdashconfig.h")
 
-if(MSVC)
+if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     add_compile_options(/FS)
-endif()
+endif ()

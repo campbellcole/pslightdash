@@ -1,7 +1,6 @@
 #include "render/texture.hpp"
 
-Texture::Texture(const std::string& filename)
-{
+Texture::Texture(const std::string &filename) {
   glGenTextures(1, &texture);
   glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -13,22 +12,18 @@ Texture::Texture(const std::string& filename)
   std::string filePath = getResourcePath("img/" + filename);
 
   int width, height, nrChannels;
-  unsigned char* data = stbi_load(filePath.c_str(), &width, &height, &nrChannels, 0);
-  if (data)
-  {
+  unsigned char *data = stbi_load(filePath.c_str(), &width, &height, &nrChannels, 0);
+  if (data) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
-  }
-  else
-  {
+  } else {
     log_err("Failed to load texture: %s", filename.c_str());
     exit(1);
   }
   //stbi_image_free(data);
 }
 
-unsigned int Texture::getTextureID()
-{
+unsigned int Texture::getTextureID() {
   return texture;
 }
 

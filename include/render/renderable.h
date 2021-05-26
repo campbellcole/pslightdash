@@ -3,9 +3,9 @@
 
 #include <string>
 
-#include "render/texture.hpp"
-#include "render/program.hpp"
-#include "render/rendercontext.hpp"
+#include "render/texture.h"
+#include "render/program.h"
+#include "render/rendercontext.h"
 #include "dbg.h"
 
 #include <glad/glad.h>

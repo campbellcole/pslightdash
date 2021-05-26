@@ -1,4 +1,4 @@
-#include "render/rendercontext.hpp"
+#include "render/rendercontext.h"
 
 RenderContext::RenderContext(int width, int height) : width(width), height(height) {
   glfwInit();
@@ -28,6 +28,9 @@ RenderContext::RenderContext(int width, int height) : width(width), height(heigh
   }
 
   glViewport(0, 0, width, height);
+  glEnable(GL_CULL_FACE);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   log_info("Initialized OpenGL v%s", glGetString(GL_VERSION));
 }

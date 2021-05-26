@@ -1,4 +1,4 @@
-#include "render/program.hpp"
+#include "render/program.h"
 
 Program::Program(const std::string &name) : name(name) {
   std::string vertexShader, fragmentShader;
@@ -86,22 +86,34 @@ Program::~Program() {
   glDeleteProgram(ID);
 }
 
-void Program::use() {
+void Program::use() const {
   glUseProgram(ID);
 }
 
-void Program::setBoolU(const std::string &name, bool value) {
+void Program::setBoolU(const std::string &name, bool value) const {
   glUniform1i(glGetUniformLocation(ID, name.c_str()), (int) value);
 }
 
-void Program::setFloatU(const std::string &name, float value) {
+void Program::setFloatU(const std::string &name, float value) const {
   glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void Program::setIntU(const std::string &name, int value) {
+void Program::setIntU(const std::string &name, int value) const {
   glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void Program::setFVec2U(const std::string &name, float x, float y) {
+void Program::setFVec2U(const std::string &name, float x, float y) const {
   glUniform2f(glGetUniformLocation(ID, name.c_str()), x, y);
+}
+
+void Program::setFVec3U(const std::string &name, glm::vec3 value) const {
+  glUniform3f(glGetUniformLocation(ID, name.c_str()), value.x, value.y, value.z);
+}
+
+void Program::setFVec3U(const std::string &name, float x, float y, float z) const {
+  glUniform3f(glGetUniformLocation(ID, name.c_str()), x, y, z);
+}
+
+void Program::setFMat4U(const std::string &name, glm::mat4 &value) const {
+  glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
 }

@@ -1,4 +1,4 @@
-#include "render/renderable.hpp"
+#include "render/renderable.h"
 
 void Renderable::DEFAULT_VAO_REGISTER() {
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) 0);
@@ -25,6 +25,7 @@ Renderable::Renderable(const std::string &name, bool textured) : name(name), tex
 
 Renderable::~Renderable() {
   glDeleteBuffers(1, &VBO);
+  glDeleteBuffers(1, &EBO);
   glDeleteVertexArrays(1, &VAO);
   if (textured && texture) {
     delete texture;
@@ -92,5 +93,5 @@ void Renderable::render() {
   program->setFloatU("uTime", glfwGetTime()); // todo: find a good place to put this
   program->setFVec2U("uResolution", parentContext->getWidth(), parentContext->getHeight());
   glBindVertexArray(VAO);
-  glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
 }

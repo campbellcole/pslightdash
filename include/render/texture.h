@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "utils.hpp"
+#include "utils.h"
 #include "dbg.h"
 #include "stb_image.h"
 

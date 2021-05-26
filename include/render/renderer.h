@@ -3,11 +3,12 @@
 
 #include <vector>
 
-#include "discordhooker.hpp"
-#include "pslightdash.hpp"
+#include "discordhooker.h"
+#include "pslightdash.h"
 #include "dbg.h"
-#include "render/program.hpp"
-#include "render/rendercontext.hpp"
+#include "render/program.h"
+#include "render/rendercontext.h"
+#include "render/font.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -18,9 +19,11 @@ class Renderer {
 private:
   RenderContext *context;
 public:
-  Renderer(RenderContext *context);
+  Renderer(int width, int height);
 
   ~Renderer();
+
+  RenderContext* getContext();
 
   void renderTargets();
 

@@ -1,4 +1,4 @@
-#include "render/texture.hpp"
+#include "render/texture.h"
 
 Texture::Texture(const std::string &filename) {
   glGenTextures(1, &texture);
@@ -20,7 +20,7 @@ Texture::Texture(const std::string &filename) {
     log_err("Failed to load texture: %s", filename.c_str());
     exit(1);
   }
-  //stbi_image_free(data);
+  stbi_image_free(data);
 }
 
 unsigned int Texture::getTextureID() {

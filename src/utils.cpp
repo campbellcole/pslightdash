@@ -2,7 +2,7 @@
 // Created by campbell on 5/25/2021.
 //
 
-#include "utils.hpp"
+#include "utils.h"
 
 std::string getResourcePath(const std::string &filename) {
   const int PATH_BUF_SIZE = 1024;

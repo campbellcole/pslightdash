@@ -6,8 +6,8 @@
 #include <string>
 
 #include "dbg.h"
-#include "render/program.hpp"
-#include "render/renderable.hpp"
+#include "render/program.h"
+#include "render/renderable.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>

@@ -1,8 +1,8 @@
-﻿#include "pslightdash.hpp"
+﻿#include "pslightdash.h"
 
 int main() {
-  const char *pslightdash = "'||''|.   .|'''.|  '||'      '||'  ..|'''.|  '||'  '||' |''||''| '||''|.       |      .|'''.|  '||'  '||' \n"
-                            " ||   ||  ||..  '   ||        ||  .|'     '   ||    ||     ||     ||   ||     |||     ||..  '   ||    ||  \n"
+  const char *pslightdash = "'||''|.   .|'''.|  '||'      '||'  ..|'''.|  '||'  '||' |''||''| '||'''|.      |      .|'''.|  '||'  '||' \n"
+                            " ||   ||  ||..  '   ||        ||  .|'     '   ||    ||     ||     ||    ||    |||     ||..  '   ||    ||  \n"
                             " ||...|'   ''|||.   ||        ||  ||    ....  ||''''||     ||     ||    ||   |  ||     ''|||.   ||''''||  \n"
                             " ||      .     '||  ||        ||  '|.    ||   ||    ||     ||     ||    ||  .''''|.  .     '||  ||    ||  \n"
                             ".||.     |'....|'  .||.....| .||.  ''|...'|  .||.  .||.   .||.   .||...|'  .|.  .||. |'....|'  .||.  .||. \n" // thanks figlet
@@ -15,8 +15,7 @@ int main() {
 
   debug("Initializing renderer...");
 
-  RenderContext *context = new RenderContext(WINDOW_WIDTH, WINDOW_HEIGHT);
-  Renderer *renderer = new Renderer(context);
+  auto *renderer = new Renderer(pslightdash_WINDOW_WIDTH, pslightdash_WINDOW_HEIGHT);
 
   debug("Initialized renderer.");
 
@@ -51,17 +50,16 @@ int main() {
       1, 2, 3
   };
 
-  Renderable *background = new Renderable("bg", false);
+  auto *background = new Renderable("bg", false);
   background->setRegisterFunction(&Renderable::COLORED_VAO_REGISTER);
   background->setRenderInfo(_v2, 24, _i2, 6);
-  context->insertTarget(background, 0);
+  renderer->getContext()->insertTarget(background, 0);
 
   debug("Starting render cycle...");
   renderer->begin();
 
   delete background;
   delete renderer;
-  delete context;
 
   return 0;
 }

@@ -2,8 +2,8 @@
 // Created by campbell on 5/25/2021.
 //
 
-#ifndef PSLIGHTDASH_UTILS_HPP
-#define PSLIGHTDASH_UTILS_HPP
+#ifndef PSLIGHTDASH_UTILS_H
+#define PSLIGHTDASH_UTILS_H
 
 #ifdef _WIN32
 
@@ -20,4 +20,4 @@
 
 std::string getResourcePath(const std::string &filename);
 
-#endif //PSLIGHTDASH_UTILS_HPP
+#endif //PSLIGHTDASH_UTILS_H

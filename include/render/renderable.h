@@ -2,33 +2,31 @@
 #define RENDER_RENDERABLE_HPP
 
 #include <string>
+#include <utility>
 
 #include "render/texture.h"
-#include "render/program.h"
+#include "render/shader.h"
 #include "render/rendercontext.h"
 #include "dbg.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-typedef void (*VAO_REGISTER_FUNC)(void);
-
 class RenderContext;
 
-class Program;
+class Shader;
 
-class Texture;
+class BasicTexture;
+
+typedef void (*VAO_REGISTER_FUNC)(void);
 
 class Renderable {
 private:
-  RenderContext *parentContext = nullptr;
-  Program *program = nullptr;
-  Texture *texture;
-  bool textured, enabled = true;
-  float *vertices;
-  unsigned int *indices;
+  Shader *shader = nullptr;
+  BasicTexture *texture;
+  bool basicTexture, generateBuffers, enabled = true;
+protected:
   unsigned int VBO, VAO, EBO, vertexCount, indexCount;
-  VAO_REGISTER_FUNC registerVAO;
 public:
   const std::string name;
 
@@ -36,23 +34,27 @@ public:
 
   static void COLORED_VAO_REGISTER();
 
-  static void TEXTURED_VAO_REGISTER();
+  static void BASIC_TEXTURED_VAO_REGISTER();
 
-  Renderable(const std::string &name, bool textured);
+  Renderable(const std::string &name,
+             bool basicTexture,
+             unsigned int vertexCount,
+             float *vertices,
+             unsigned int indexCount,
+             unsigned int *indices,
+             bool dynamicDraw = false,
+             bool generateBuffers = true,
+             VAO_REGISTER_FUNC registerVAO = &Renderable::DEFAULT_VAO_REGISTER,
+             Shader *shader = nullptr);
 
   ~Renderable();
 
   void setEnabled(bool enabled);
 
-  bool getEnabled();
+  bool isEnabled() const;
 
-  void setRegisterFunction(VAO_REGISTER_FUNC registerVAO);
+  virtual void render(RenderContext *context);
 
-  void setRenderInfo(float *vertices, unsigned int vertexCount, unsigned int *indices, unsigned int indexCount);
-
-  void initialize(RenderContext *context);
-
-  void render();
 };
 
 

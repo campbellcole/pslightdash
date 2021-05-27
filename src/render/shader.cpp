@@ -1,6 +1,6 @@
-#include "render/program.h"
+#include "render/shader.h"
 
-Program::Program(const std::string &name) : name(name) {
+Shader::Shader(const std::string &name) : name(name) {
   std::string vertexShader, fragmentShader;
   std::ifstream vertFileStream, fragFileStream;
 
@@ -82,38 +82,38 @@ Program::Program(const std::string &name) : name(name) {
   glDeleteShader(fragment);
 }
 
-Program::~Program() {
+Shader::~Shader() {
   glDeleteProgram(ID);
 }
 
-void Program::use() const {
+void Shader::use() {
   glUseProgram(ID);
 }
 
-void Program::setBoolU(const std::string &name, bool value) const {
+void Shader::setBoolU(const std::string &name, bool value) {
   glUniform1i(glGetUniformLocation(ID, name.c_str()), (int) value);
 }
 
-void Program::setFloatU(const std::string &name, float value) const {
+void Shader::setFloatU(const std::string &name, float value) {
   glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void Program::setIntU(const std::string &name, int value) const {
+void Shader::setIntU(const std::string &name, int value) {
   glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
 
-void Program::setFVec2U(const std::string &name, float x, float y) const {
+void Shader::setFVec2U(const std::string &name, float x, float y) {
   glUniform2f(glGetUniformLocation(ID, name.c_str()), x, y);
 }
 
-void Program::setFVec3U(const std::string &name, glm::vec3 value) const {
+void Shader::setFVec3U(const std::string &name, glm::vec3 value) {
   glUniform3f(glGetUniformLocation(ID, name.c_str()), value.x, value.y, value.z);
 }
 
-void Program::setFVec3U(const std::string &name, float x, float y, float z) const {
+void Shader::setFVec3U(const std::string &name, float x, float y, float z) {
   glUniform3f(glGetUniformLocation(ID, name.c_str()), x, y, z);
 }
 
-void Program::setFMat4U(const std::string &name, glm::mat4 &value) const {
+void Shader::setFMat4U(const std::string &name, glm::mat4 &value) {
   glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
 }

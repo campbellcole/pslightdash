@@ -5,8 +5,9 @@
 #include <sstream>
 
 #include "render/renderer.h" // must be on top because program includes utils which includes windows.h and httplib must be first
-#include "render/program.h"
+#include "render/shader.h"
 #include "render/rendercontext.h"
+#include "render/text.h"
 #include "dbg.h"
 #include "pslightdashconfig.h"
 

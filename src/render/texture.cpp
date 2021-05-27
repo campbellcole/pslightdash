@@ -1,6 +1,6 @@
 #include "render/texture.h"
 
-Texture::Texture(const std::string &filename) {
+BasicTexture::BasicTexture(const std::string &filename) {
   glGenTextures(1, &texture);
   glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -23,7 +23,7 @@ Texture::Texture(const std::string &filename) {
   stbi_image_free(data);
 }
 
-unsigned int Texture::getTextureID() {
+unsigned int BasicTexture::getTextureID() {
   return texture;
 }
 

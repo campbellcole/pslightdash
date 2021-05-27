@@ -6,7 +6,7 @@
 #include "discordhooker.h"
 #include "pslightdash.h"
 #include "dbg.h"
-#include "render/program.h"
+#include "render/shader.h"
 #include "render/rendercontext.h"
 #include "render/font.h"
 

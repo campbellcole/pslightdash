@@ -17,31 +17,31 @@
 #define FORMAT_SHADER_COMPILE_ERROR "Failed to compile %s shader: %s\nError: %s\n"
 #define FORMAT_PROGRAM_LINK_ERROR "Failed to link program: %d\nError: %s\n"
 
-class Program {
+class Shader {
 private:
   unsigned int ID;
 public:
   const std::string name;
 
-  Program(const std::string &name);
+  Shader(const std::string &name);
 
-  ~Program();
+  ~Shader();
 
-  void use() const;
+  void use();
 
-  void setBoolU(const std::string &name, bool value) const;
+  void setBoolU(const std::string &name, bool value);
 
-  void setFloatU(const std::string &name, float value) const;
+  void setFloatU(const std::string &name, float value);
 
-  void setIntU(const std::string &name, int value) const;
+  void setIntU(const std::string &name, int value);
 
-  void setFVec2U(const std::string &name, float x, float y) const;
+  void setFVec2U(const std::string &name, float x, float y);
 
-  void setFVec3U(const std::string &name, glm::vec3 value) const;
+  void setFVec3U(const std::string &name, glm::vec3 value);
 
-  void setFVec3U(const std::string &name, float x, float y, float z) const;
+  void setFVec3U(const std::string &name, float x, float y, float z);
 
-  void setFMat4U(const std::string &name, glm::mat4 &value) const;
+  void setFMat4U(const std::string &name, glm::mat4 &value);
 };
 
 #endif // RENDER_PROGRAM_HPP

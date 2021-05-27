@@ -33,7 +33,7 @@ int main() {
   };
 
   Renderable *testTriangle1 = new Renderable("test", true);
-  testTriangle1->setRegisterFunction(&Renderable::TEXTURED_VAO_REGISTER);
+  testTriangle1->setRegisterFunction(&Renderable::BASIC_TEXTURED_VAO_REGISTER);
   testTriangle1->setRenderInfo(_v1, 32, _i1, 6);
   context->addTarget(testTriangle1);
   */
@@ -50,10 +50,12 @@ int main() {
       1, 2, 3
   };
 
-  auto *background = new Renderable("bg", false);
-  background->setRegisterFunction(&Renderable::COLORED_VAO_REGISTER);
-  background->setRenderInfo(_v2, 24, _i2, 6);
+  Font *VCR = new Font("VCR_MONO", 24);
+  Text *test = VCR->drawText("PSLIGHTDASH", 30, 30, 1, glm::vec3(0.7, 0.0, 0.3));
+
+  auto *background = new Renderable("bg", false, 24, _v2, 6, _i2, false, true, &Renderable::COLORED_VAO_REGISTER);
   renderer->getContext()->insertTarget(background, 0);
+  renderer->getContext()->addTarget(test);
 
   debug("Starting render cycle...");
   renderer->begin();

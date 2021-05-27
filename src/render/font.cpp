@@ -4,6 +4,26 @@
 
 #include "render/font.h"
 
+void Font::GLYPH_VAO_REGISTER() {
+  /*
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);*/
+  // do nothing, find an easier way to tell compiler to do nothing
+}
+
+Shader* Font::fontShader = nullptr; // could probably be inline but i don't want to accidentally recreate the shader
+
+Shader* Font::getFontShader() {
+  if (!Font::fontShader) {
+    Font::fontShader = new Shader("font");
+    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(pslightdash_WINDOW_WIDTH), 0.0f,
+                                      static_cast<float>(pslightdash_WINDOW_HEIGHT));
+    Font::fontShader->use();
+    Font::fontShader->setFMat4U("projection", projection);
+  }
+  return Font::fontShader;
+}
+
 Font::Font(const std::string &name, int size) {
   FT_Library ft;
   if (FT_Init_FreeType(&ft)) {
@@ -68,69 +88,43 @@ Font::Font(const std::string &name, int size) {
 
   glGenBuffers(1, &VBO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 16, nullptr, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * GLYPH_VERTEX_COUNT, nullptr, GL_DYNAMIC_DRAW);
 
   glGenBuffers(1, &EBO);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 6, nullptr, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * GLYPH_INDEX_COUNT, nullptr, GL_DYNAMIC_DRAW);
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
-
-  program = new Program("font");
-  glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(pslightdash_WINDOW_WIDTH), 0.0f,
-                                    static_cast<float>(pslightdash_WINDOW_HEIGHT));
-  program->use();
-  program->setFMat4U("projection", projection);
 }
 
 Font::~Font() {
   glDeleteBuffers(1, &VBO);
   glDeleteBuffers(1, &EBO);
   glDeleteVertexArrays(1, &VAO);
-  if (program) {
-    delete program;
-    program = nullptr;
+  if (Font::fontShader) {
+    delete Font::fontShader;
+    Font::fontShader = nullptr;
   }
 }
 
-void Font::draw(std::string text, float x, float y, float scale, glm::vec3 color) {
-  if (!program) return;
+Text* Font::drawText(std::string text, float x, float y, float scale, glm::vec3 color) {
+  Text *target = new Text(this, text, x, y, scale, color);
+  return target;
+}
 
-  program->use();
-  program->setFVec3U("textColor", color);
-  glActiveTexture(GL_TEXTURE0);
-  glBindVertexArray(VAO);
+unsigned int Font::getVAO() {
+  return VAO;
+}
 
-  std::string::const_iterator c;
-  for (c = text.begin(); c != text.end(); c++) {
-    Character ch = characters[*c];
+unsigned int Font::getVBO() {
+  return VBO;
+}
 
-    float xpos = x + ch.bearing.x * scale;
-    float ypos = y - (ch.size.y - ch.bearing.y) * scale;
+unsigned int Font::getEBO() {
+  return EBO;
+}
 
-    float w = ch.size.x * scale;
-    float h = ch.size.y * scale;
-
-    float vertices[] {
-      xpos    , ypos + h, 0.0f, 0.0f,
-      xpos    , ypos    , 0.0f, 1.0f,
-      xpos + w, ypos    , 1.0f, 1.0f,
-      xpos + w, ypos + h, 1.0f, 0.0f
-    };
-
-    unsigned int indices[] {
-      0, 1, 2,
-      0, 2, 3
-    };
-
-    glBindTexture(GL_TEXTURE_2D, ch.textureID);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(indices), indices);
-
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-    x += (ch.advance >> 6) * scale;
-  }
+const std::map<char, Character>* Font::getCharacters() {
+  return &characters;
 }

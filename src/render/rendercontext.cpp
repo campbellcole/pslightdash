@@ -8,9 +8,9 @@ RenderContext::RenderContext(int width, int height) : width(width), height(heigh
 #ifdef __APPLE__
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-  window = glfwCreateWindow(width, height, "DashRender", NULL, NULL);
+  window = glfwCreateWindow(width, height, "PSLIGHTDASH", nullptr, nullptr);
 
-  if (window == NULL) {
+  if (window == nullptr) {
     log_err("failed to create window");
     glfwTerminate();
     exit(1);
@@ -28,7 +28,7 @@ RenderContext::RenderContext(int width, int height) : width(width), height(heigh
   }
 
   glViewport(0, 0, width, height);
-  glEnable(GL_CULL_FACE);
+  //glEnable(GL_CULL_FACE);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -58,12 +58,10 @@ void RenderContext::handleResize(GLFWwindow *window, int width, int height) {
 }
 
 void RenderContext::addTarget(Renderable *target) {
-  target->initialize(this);
   targets.push_back(target);
 }
 
 void RenderContext::insertTarget(Renderable *target, int index) {
-  target->initialize(this);
   targets.insert(std::next(targets.begin(), index), target);
 }
 

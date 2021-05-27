@@ -6,7 +6,7 @@ Renderer::Renderer(int width, int height) {
 
 void Renderer::renderTargets() {
   for (Renderable *r : context->getTargets()) {
-    r->render();
+    r->render(context);
   }
 }
 
@@ -33,7 +33,7 @@ void Renderer::handleInput(GLFWwindow *window) {
   {
     if (glfwGetTime() - lastPress > 1.0) {
       lastPress = glfwGetTime();
-      context->getTargets().front()->setEnabled(!context->getTargets().front()->getEnabled());
+      context->getTargets().front()->setEnabled(!context->getTargets().front()->isEnabled());
     }
   }
 }
@@ -41,7 +41,6 @@ void Renderer::handleInput(GLFWwindow *window) {
 void Renderer::begin() {
   int frameCount = 0;
   double prevTime = 0.0;
-  Font test("VCR_MONO", 24);
   while (!glfwWindowShouldClose(context->window)) {
     double currentTime = glfwGetTime();
     frameCount++;
@@ -55,12 +54,10 @@ void Renderer::begin() {
 
     handleInput(context->window);
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0.2, 0.0, 0.5, 1.0);
 
     renderTargets();
-
-    test.draw("PSLIGHTDASH", 15, 15, 1, glm::ivec3(0.7, 0.0, 0.3));
 
     glfwSwapBuffers(context->window);
     glfwPollEvents();

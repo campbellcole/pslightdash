@@ -6,7 +6,7 @@
 #include <string>
 
 #include "dbg.h"
-#include "render/program.h"
+#include "render/shader.h"
 #include "render/renderable.h"
 
 #include <glad/glad.h>

@@ -10,11 +10,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-class Texture {
+class BasicTexture {
 private:
   unsigned int texture;
 public:
-  Texture(const std::string &filename);
+  BasicTexture(const std::string &filename);
 
   unsigned int getTextureID();
 };

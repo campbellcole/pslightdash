@@ -8,60 +8,10 @@ int main() {
                             ".||.     |'....|'  .||.....| .||.  ''|...'|  .||.  .||.   .||.   .||...|'  .|.  .||. |'....|'  .||.  .||. \n" // thanks figlet
                             "Written by pslight (Campbell Cole)\n";
   std::cout << pslightdash;
-  std::cout << "Version: " << PSLIGHTDASH_VERSION << std::endl << std::endl;
+  std::cout << "Version: " << pslightdash_VERSION << std::endl << std::endl;
 #ifndef DASHRENDER_DEBUG
   log_info("DEBUG ENABLED");
 #endif
-
-  debug("Initializing renderer...");
-
-  auto *renderer = new Renderer(pslightdash_WINDOW_WIDTH, pslightdash_WINDOW_HEIGHT);
-
-  debug("Initialized renderer.");
-
-  /*
-  float _v1[] = {
-      0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-      0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, -1.0f,
-      -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, -1.0f,
-      -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 1.0f
-  };
-
-  unsigned int _i1[] = {
-      0, 1, 3,
-      1, 2, 3
-  };
-
-  Renderable *testTriangle1 = new Renderable("test", true);
-  testTriangle1->setRegisterFunction(&Renderable::BASIC_TEXTURED_VAO_REGISTER);
-  testTriangle1->setRenderInfo(_v1, 32, _i1, 6);
-  context->addTarget(testTriangle1);
-  */
-
-  float _v2[] = {
-      1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f,//   1.0f,  1.0f,
-      1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,//   1.0f, -1.0f,
-      -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,//  -1.0f, -1.0f,
-      -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f//,  -1.0f,  1.0f
-  };
-
-  unsigned int _i2[] = {
-      0, 1, 3,
-      1, 2, 3
-  };
-
-  Font *VCR = new Font("VCR_MONO", 24);
-  Text *test = VCR->drawText("PSLIGHTDASH", 30, 30, 1, glm::vec3(0.7, 0.0, 0.3));
-
-  auto *background = new Renderable("bg", false, 24, _v2, 6, _i2, false, true, &Renderable::COLORED_VAO_REGISTER);
-  renderer->getContext()->insertTarget(background, 0);
-  renderer->getContext()->addTarget(test);
-
-  debug("Starting render cycle...");
-  renderer->begin();
-
-  delete background;
-  delete renderer;
 
   return 0;
 }

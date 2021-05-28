@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
-project(pslightdash VERSION 0.0.1)
+project(pslightdash VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -22,7 +22,7 @@ target_link_libraries(pslightdash PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
 add_custom_command(TARGET pslightdash PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/res/ $<TARGET_FILE_DIR:pslightdash>/res/)
 
-configure_file("include/pslightdashconfig.h.in" "include/pslightdashconfig.h")
+configure_file("${CMAKE_CURRENT_LIST_DIR}/include/pslightdashconfig.h.in" "${CMAKE_CURRENT_LIST_DIR}/include/pslightdashconfig.h")
 
 if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)

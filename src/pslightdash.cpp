@@ -13,5 +13,16 @@ int main() {
   log_info("DEBUG ENABLED");
 #endif
 
+  dash::GLContext *context = new dash::GLContext(pslightdash_WINDOW_WIDTH, pslightdash_WINDOW_HEIGHT);
+
+  auto *renderer = new dash::Renderer(context);
+
+  renderer->initialize();
+
+  renderer->start();
+
+  delete renderer;
+  delete context;
+
   return 0;
 }

@@ -5,9 +5,12 @@
 #ifndef PSLIGHTDASH_PSLIGHTDASH_H
 #define PSLIGHTDASH_PSLIGHTDASH_H
 
+#include <iostream>
+
 #include "dbg.h"
 #include "pslightdashconfig.h"
-#include <iostream>
+#include "gl/glcontext.h"
+#include "renderer.h"
 
 int main();
 

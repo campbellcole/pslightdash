@@ -5,21 +5,26 @@
 #include "renderer.h"
 
 namespace dash {
-  Renderer::Renderer(int width, int height, Context *context) : width(width), height(height), context(context) {}
-  Renderer::Renderer(int width, int height) : Renderer(width, height, nullptr) {}
+  Renderer::Renderer(GLContext *context) : width(context->getWidth()), height(context->getHeight()), context(context) {}
+  Renderer::Renderer(int width, int height) : width(width), height(height), context(nullptr) {}
   Renderer::Renderer() : Renderer(pslightdash_WINDOW_WIDTH, pslightdash_WINDOW_HEIGHT) {}
   Renderer::~Renderer() {
-    if (context) {
+    if (manageContext && context) {
       delete context;
       context = nullptr;
     }
   }
   void Renderer::initialize() {
     if (!context) {
-      // initialize context
+      manageContext = true;
+      context = new DEFAULT_CONTEXT(width, height);
+    }
+    if (!context->initialized()) {
+      context->initialize();
     }
   }
-  void Renderer::start() {
 
+  void Renderer::start() {
+    context->start();
   }
 }

@@ -5,21 +5,25 @@
 #ifndef PSLIGHTDASH_RENDERER_H
 #define PSLIGHTDASH_RENDERER_H
 
+#define DEFAULT_CONTEXT GLContext
+
 #include "pslightdashconfig.h"
-#include "context.h"
+#include "gl/glcontext.h"
 
 namespace dash {
   class Renderer {
   private:
     int width, height;
-    Context *context;
+    GLContext *context;
+    bool manageContext = false;
   public:
-    Renderer(int width, int height, Context *context);
+    explicit Renderer(GLContext *context);
     Renderer(int width, int height);
     Renderer();
     ~Renderer();
     void initialize();
-    Context *getContext();
+    void renderTargets();
+    GLContext *getContext();
     void start();
   };
 }

@@ -65,9 +65,7 @@ namespace dash {
   }
 
   void GLContext::addTarget(GLRenderTarget *target) {
-    if (targetsByShader.find(target->getShader()) != targetsByShader.end()) {
-      targetsByShader.at(target->getShader()).push_back(target);
-    }
+    targetsByShader.insert(std::make_pair(target->getShader(), target));
     //targets.push_back(target);
   }
 /* hopefully it's practical to add elements in the right order
@@ -76,18 +74,20 @@ namespace dash {
     targets.insert(std::next(targets.begin(), position), target);
   }
 */
-  bool GLContext::removeTarget(const std::string &name) {
-    bool found = false;
-    bool *fPtr = &found;
-    for (auto & [shader, targets] : targetsByShader) {
-      targets.remove_if([name, fPtr](GLRenderTarget *t) {
-        if (t->getName() == name) {
-          return (*fPtr = true);
-        } else return false;
-      });
-      if (found) break;
+  bool GLContext::removeTarget(const std::string &name) { // this can DEFINITELY be optimized
+    for (std::pair<GLShader *const, GLRenderTarget *> pair : targetsByShader) {
+      if (pair.second->getName() == name) {
+        std::pair<map_iter, map_iter> iterpair = targetsByShader.equal_range(pair.first);
+        auto it = iterpair.first;
+        for (; it != iterpair.second; ++it) {
+          if (it->second->getName() == name) {
+            targetsByShader.erase(it);
+            return true;
+          }
+        }
+      }
     }
-    return found;
+    return false;
   }
 
   void GLContext::_handleResize(GLFWwindow *window, int width, int height) {
@@ -105,11 +105,14 @@ namespace dash {
       glClear(GL_COLOR_BUFFER_BIT);
       glClearColor(0.3, 0.0, 0.8, 1.0);
 
-      for (auto & [shader, targets] : targetsByShader) {
-        shader->use();
-        for (auto target : targets)
-          if (target->isEnabled())
-            target->render(this->window);
+      for (map_iter it = targetsByShader.begin(), end = targetsByShader.end(); it != end; it = targetsByShader.upper_bound(it->first)) {
+        std::pair<map_iter, map_iter> iterpair = targetsByShader.equal_range(it->first);
+        it->first->use(); // activate shader
+        GLShader::setDefaultUniforms(it->first, glm::vec2(this->getWidth(), this->getHeight()));
+        auto shader_it = iterpair.first;
+        for (; shader_it != iterpair.second; ++shader_it) {
+          shader_it->second->render(this->window);
+        }
       }
 
       glfwSwapBuffers(this->window);

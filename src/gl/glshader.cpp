@@ -5,10 +5,15 @@
 #include "gl/glshader.h"
 
 namespace dash {
+  void GLShader::setDefaultUniforms(GLShader *shader, glm::vec2 resolution) {
+    shader->setUFloat("uTime", glfwGetTime()); // todo: find a good place to put this
+    shader->setUVec2F("uResolution", resolution.x, resolution.y);
+  }
+
   GLShader::GLShader(std::string name)
       : GLShader(name, (name + "_vertex.glsl"), (name + "_fragment.glsl")) {}
 
-  GLShader::GLShader(std::string name, std::string vertexFilename, std::string fragmentFilename) : name(std::move(name)) {
+  GLShader::GLShader(std::string name, std::string vertexFilename, std::string fragmentFilename) {
     std::string vertexShader, fragmentShader;
     std::ifstream readStream;
 
@@ -24,7 +29,7 @@ namespace dash {
       readStream.close();
       vertexShader = vertStream.str();
     } catch (std::ifstream::failure &e) {
-      log_err("Failed to read vertex shader: %s (Error %d: %s)", vertexShaderPath.c_str(), e.code().value(), e.code().message().c_str());
+      log_err("Failed to read \"%s\" vertex shader: %s (Error %d: %s)", name.c_str(), vertexShaderPath.c_str(), e.code().value(), e.code().message().c_str());
     }
 
     try {
@@ -34,7 +39,7 @@ namespace dash {
       readStream.close();
       fragmentShader = fragStream.str();
     } catch (std::ifstream::failure &e) {
-      log_err("Failed to read fragment shader: %s (Error %d: %s)", fragmentShaderPath.c_str(), e.code().value(), e.code().message().c_str());
+      log_err("Failed to read \"%s\" fragment shader: %s (Error %d: %s)", name.c_str(), fragmentShaderPath.c_str(), e.code().value(), e.code().message().c_str());
     }
 
     const char *cstrVert = vertexShader.c_str();
@@ -49,8 +54,8 @@ namespace dash {
     glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
     if (!success) {
       glGetShaderInfoLog(vertex, 512, nullptr, infoLog);
-      log_err("Failed to compile vertex shader: %s (Error: %s)", vertexShaderPath.c_str(), infoLog);
-    } else debug("Successfully compiled vertex shader.");
+      log_err("Failed to compile \"%s\" vertex shader: %s (Error: %s)", name.c_str(), vertexShaderPath.c_str(), infoLog);
+    } else debug("Successfully compiled vertex shader: %s", vertexShaderPath.c_str());
 
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment, 1, &cstrFrag, nullptr);
@@ -58,8 +63,8 @@ namespace dash {
     glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
     if (!success) {
       glGetShaderInfoLog(fragment, 512, nullptr, infoLog);
-      log_err("Failed to compile fragment shader: %s (Error: %s)", fragmentShaderPath.c_str(), infoLog);
-    } else debug("Successfully compiled fragment shader.");
+      log_err("Failed to compile \"%s\" fragment shader: %s (Error: %s)", name.c_str(), fragmentShaderPath.c_str(), infoLog);
+    } else debug("Successfully compiled fragment shader: %s", fragmentShaderPath.c_str());
 
     ID = glCreateProgram();
     glAttachShader(ID, vertex);
@@ -80,7 +85,7 @@ namespace dash {
     glDeleteProgram(ID);
   }
 
-  void GLShader::use() {
+  void GLShader::use() const {
     glUseProgram(ID);
   }
 

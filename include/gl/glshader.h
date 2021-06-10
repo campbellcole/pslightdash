@@ -16,21 +16,23 @@
 #include <fstream>
 
 #include <glad/glad.h>
+#include "GLFW/glfw3.h"
 #include <glm/glm.hpp>
 
 namespace dash {
   class GLShader {
   private:
     unsigned int ID;
-    const std::string name;
   public:
+    static void setDefaultUniforms(GLShader *shader, glm::vec2 resolution);
+
     explicit GLShader(std::string name);
 
     GLShader(std::string name, std::string vertexFilename, std::string fragmentFilename);
 
     ~GLShader();
 
-    void use();
+    void use() const;
 
     void setUBool(const std::string &name, bool value);
 

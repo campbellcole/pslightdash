@@ -5,12 +5,16 @@
 #ifndef PSLIGHTDASH_GLRENDERTARGETBUILDER_H
 #define PSLIGHTDASH_GLRENDERTARGETBUILDER_H
 
+#include "gl/glshader.h"
+#include "gl/glrendertarget.h"
+#include "dbg.h"
+
+#include "GLFW/glfw3.h"
+#include "glad/glad.h"
+
 #include <string>
 #include <functional>
 #include <vector>
-
-#include "glshader.h"
-#include "glrendertarget.h"
 
 namespace dash {
   class GLRenderTargetBuilder {
@@ -23,23 +27,25 @@ namespace dash {
     bool hasRenderFunction = false;
     bool hasVAOFunction = false;
     bool hasRenderData = false;
-    std::string name;
+    std::string _name;
     // Texture *texture;
-    unsigned int VBO, VAO, EBO;
-    GLShader *shader;
-    std::function<void()> render, registerVAO;
-    std::vector<float> vertices;
-    std::vector<unsigned int> indices;
+    unsigned int _VBO = 0, _VAO = 0, _EBO = 0;
+    GLShader *_shader;
+    std::function<void(GLRenderTarget*)> _render;
+    std::function<void()> _registerVAO;
+    float *_vertices;
+    unsigned int *_indices;
+    unsigned int _vertexCount, _indexCount;
   public:
     GLRenderTargetBuilder();
     GLRenderTargetBuilder *withName(std::string name);
     GLRenderTargetBuilder *withTexture(/*Texture *texture*/); // TODO: implement this + texture class
     GLRenderTargetBuilder *withBuffers(unsigned int VBO, unsigned int VAO, unsigned int EBO);
-    GLRenderTargetBuilder *usingDynamicDraw();
+    GLRenderTargetBuilder *usingDynamicDraw(unsigned int vertexCount, unsigned int indexCount);
     GLRenderTargetBuilder *withShader(GLShader *shader);
-    GLRenderTargetBuilder *withRenderFunction(std::function<void()> render);
+    GLRenderTargetBuilder *withRenderFunction(std::function<void(GLRenderTarget*)> render);
     GLRenderTargetBuilder *withVAORegisterFunction(std::function<void()> registerVAO);
-    GLRenderTargetBuilder *withRenderData(std::vector<float> vertices, std::vector<unsigned int> indices);
+    GLRenderTargetBuilder *withRenderData(float *vertices, unsigned int *indices, unsigned int vertexCount, unsigned int indexCount);
     GLRenderTarget *build();
   };
 }

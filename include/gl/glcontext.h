@@ -11,6 +11,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 #include <string>
 #include <list>
@@ -19,8 +20,8 @@
 namespace dash {
   class GLContext {
   private:
-    std::map<GLShader *, std::list<GLRenderTarget*>> targetsByShader;
-    //std::list<GLRenderTarget *> targets;
+    std::multimap<GLShader *, GLRenderTarget *> targetsByShader;
+    typedef std::multimap<GLShader *, GLRenderTarget *>::iterator map_iter;
 
     unsigned int width, height;
 
@@ -37,8 +38,6 @@ namespace dash {
     void initialize();
 
     void addTarget(GLRenderTarget *target);
-
-    //void insertTarget(GLRenderTarget *target, int position);
 
     bool removeTarget(const std::string &name);
 

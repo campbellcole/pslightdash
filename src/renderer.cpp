@@ -9,7 +9,7 @@ namespace dash {
   Renderer::Renderer(int width, int height) : width(width), height(height), context(nullptr) {}
   Renderer::Renderer() : Renderer(pslightdash_WINDOW_WIDTH, pslightdash_WINDOW_HEIGHT) {}
   Renderer::~Renderer() {
-    if (manageContext && context) {
+    if (manageContext) {
       delete context;
       context = nullptr;
     }

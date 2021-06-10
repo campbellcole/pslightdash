@@ -1,7 +1,12 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.16)
 project(pslightdash VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 20)
+set(DO_MEMCHECK FALSE)
+
+if (UNIX AND DO_MEMCHECK)
+    set(CMAKE_CXX_FLAGS "-fsanitize=address")
+endif()
 
 file(GLOB_RECURSE SourceFiles "${CMAKE_CURRENT_LIST_DIR}/src/*")
 set(PSLIGHTDASH_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/include/")
@@ -16,7 +21,11 @@ target_link_libraries(pslightdash PRIVATE glm::glm)
 find_package(freetype CONFIG REQUIRED)
 target_link_libraries(pslightdash PRIVATE freetype)
 find_package(jsoncpp CONFIG REQUIRED)
-target_link_libraries(pslightdash PRIVATE jsoncpp_lib jsoncpp_object)
+if (UNIX)
+    target_link_libraries(pslightdash PRIVATE jsoncpp_static jsoncpp_object)
+elseif(MSVC)
+    target_link_libraries(pslightdash PRIVATE jsoncpp_lib jsoncpp_object)
+endif()
 find_package(OpenSSL REQUIRED)
 target_link_libraries(pslightdash PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 

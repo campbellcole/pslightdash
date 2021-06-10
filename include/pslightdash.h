@@ -11,6 +11,7 @@
 #include "pslightdashconfig.h"
 #include "gl/glcontext.h"
 #include "renderer.h"
+#include "dash/testrendertarget.h"
 
 int main();
 

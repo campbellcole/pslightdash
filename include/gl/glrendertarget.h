@@ -17,22 +17,41 @@
 
 namespace dash {
   class GLRenderTarget {
-  private:
-    bool enabled;
-    std::string name;
+  protected:
+    bool _enabled, _dynamicDraw, _manageBuffers;
+    std::string _name;
     // Texture *texture;
-    unsigned int VBO, VAO, EBO;
-    GLShader *shader;
-    std::function<void()> renderFunc, registerVAO;
-    std::vector<float> vertices;
-    std::vector<unsigned int> indices;
+    unsigned int _VBO, _VAO, _EBO;
+    GLShader *_shader;
+    std::function<void(GLRenderTarget*)> _renderFunc;
+    float *_vertices;
+    unsigned int *_indices;
+    unsigned int _vertexCount, _indexCount;
   public:
-    explicit GLRenderTarget(std::string name);
-    //GLRenderTarget* withShader(Shader *shader);
+    GLRenderTarget(
+        std::string name,
+        /*GLTexture *texture,*/
+        unsigned int VBO,
+        unsigned int VAO,
+        unsigned int EBO,
+        bool dynamicDraw,
+        bool manageBuffers,
+        GLShader *shader,
+        std::function<void(GLRenderTarget*)> render,
+        float *vertices,
+        unsigned int *indices,
+        unsigned int vertexCount,
+        unsigned int indexCount);
+    ~GLRenderTarget();
     [[nodiscard]] const std::string& getName() const;
     [[nodiscard]] bool isEnabled() const;
+    void setEnabled(bool enabled);
     [[nodiscard]] GLShader *getShader();
-    void render(GLFWwindow *window);
+    [[nodiscard]] unsigned int getVBO() const;
+    [[nodiscard]] unsigned int getVAO() const;
+    [[nodiscard]] unsigned int getEBO() const;
+    void render(GLFWwindow *window) ;
+    void render(GLFWwindow *window, float *vertices, unsigned int *indices, unsigned int vertexCount, unsigned int indexCount);
   };
 }
 

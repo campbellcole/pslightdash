@@ -5,6 +5,7 @@
 #ifndef PSLIGHTDASH_GLCONTEXT_H
 #define PSLIGHTDASH_GLCONTEXT_H
 
+#include "pslightdashconfig.h"
 #include "gl/glshader.h"
 #include "gl/glrendertarget.h"
 #include "dbg.h"

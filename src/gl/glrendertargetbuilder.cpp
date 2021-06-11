@@ -4,8 +4,6 @@
 
 #include "gl/glrendertargetbuilder.h"
 
-#include <utility>
-
 namespace dash {
 
   GLRenderTargetBuilder::GLRenderTargetBuilder() {}
@@ -16,8 +14,9 @@ namespace dash {
     return this;
   }
 
-  GLRenderTargetBuilder *GLRenderTargetBuilder::withTexture() {
+  GLRenderTargetBuilder *GLRenderTargetBuilder::withTexture(GLTexture *texture) {
     this->textured = true;
+    this->_texture = texture;
     return this;
   }
 
@@ -112,7 +111,14 @@ namespace dash {
         return nullptr;
       }
     }
-    auto _instance = new GLRenderTarget(_name, _VBO, _VAO, _EBO, dynamicDraw, !preBuffered, _shader, _render, _vertices, _indices, _vertexCount, _indexCount);
+    if (this->textured && !this->_texture) {
+      if (!this->named) {
+        log_err("Cannot load a default texture without a target name");
+        return nullptr;
+      }
+      this->_texture = new GLTexture(this->_name);
+    }
+    auto _instance = new GLRenderTarget(_name, _VBO, _VAO, _EBO, dynamicDraw, !preBuffered, _shader, _texture, _render, _vertices, _indices, _vertexCount, _indexCount);
     return _instance;
   }
 

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(pslightdash VERSION 0.1.0)
+project(pslightdash VERSION 0.1.2)
 
 set(CMAKE_CXX_STANDARD 20)
 set(DO_MEMCHECK FALSE)

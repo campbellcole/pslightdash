@@ -101,7 +101,18 @@ namespace dash {
   }
 
   void GLContext::start() {
+    int frameCount = 0;
+    double prevTime = 0.0;
     while (!glfwWindowShouldClose(this->window)) {
+      double currentTime = glfwGetTime();
+      frameCount++;
+      if (currentTime - prevTime >= 1.0) {
+        std::stringstream ss;
+        ss << "PSLIGHTDASH " << pslightdash_VERSION << " [" << frameCount << " FPS]";
+        glfwSetWindowTitle(this->window, ss.str().c_str());
+        frameCount = 0;
+        prevTime = currentTime;
+      }
       glClear(GL_COLOR_BUFFER_BIT);
       glClearColor(0.3, 0.0, 0.8, 1.0);
 

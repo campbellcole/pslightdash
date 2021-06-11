@@ -13,6 +13,7 @@ namespace dash {
       bool dynamicDraw,
       bool manageBuffers,
       GLShader *shader,
+      GLTexture *texture,
       std::function<void(GLRenderTarget*)> render,
       float *vertices,
       unsigned int *indices,
@@ -26,6 +27,7 @@ namespace dash {
         _dynamicDraw(dynamicDraw),
         _manageBuffers(manageBuffers),
         _shader(shader),
+        _texture(texture),
         _renderFunc(std::move(render)),
         _vertices(vertices),
         _indices(indices),
@@ -58,6 +60,10 @@ namespace dash {
 
   GLShader *GLRenderTarget::getShader() {
     return this->_shader;
+  }
+
+  GLTexture *GLRenderTarget::getTexture() {
+    return this->_texture;
   }
 
   unsigned int GLRenderTarget::getVBO() const {

@@ -6,6 +6,7 @@
 #define PSLIGHTDASH_GLRENDERTARGET_H
 
 #include "gl/glshader.h"
+#include "gl/gltexture.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -20,9 +21,9 @@ namespace dash {
   protected:
     bool _enabled, _dynamicDraw, _manageBuffers;
     std::string _name;
-    // Texture *texture;
     unsigned int _VBO, _VAO, _EBO;
     GLShader *_shader;
+    GLTexture *_texture;
     std::function<void(GLRenderTarget*)> _renderFunc;
     float *_vertices;
     unsigned int *_indices;
@@ -30,13 +31,13 @@ namespace dash {
   public:
     GLRenderTarget(
         std::string name,
-        /*GLTexture *texture,*/
         unsigned int VBO,
         unsigned int VAO,
         unsigned int EBO,
         bool dynamicDraw,
         bool manageBuffers,
         GLShader *shader,
+        GLTexture *texture,
         std::function<void(GLRenderTarget*)> render,
         float *vertices,
         unsigned int *indices,
@@ -47,6 +48,7 @@ namespace dash {
     [[nodiscard]] bool isEnabled() const;
     void setEnabled(bool enabled);
     [[nodiscard]] GLShader *getShader();
+    [[nodiscard]] GLTexture *getTexture();
     [[nodiscard]] unsigned int getVBO() const;
     [[nodiscard]] unsigned int getVAO() const;
     [[nodiscard]] unsigned int getEBO() const;

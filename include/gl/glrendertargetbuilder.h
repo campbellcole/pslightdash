@@ -7,14 +7,16 @@
 
 #include "gl/glshader.h"
 #include "gl/glrendertarget.h"
+#include "gl/gltexture.h"
 #include "dbg.h"
 
-#include "GLFW/glfw3.h"
 #include "glad/glad.h"
+#include "GLFW/glfw3.h"
 
 #include <string>
 #include <functional>
 #include <vector>
+#include <utility>
 
 namespace dash {
   class GLRenderTargetBuilder {
@@ -28,7 +30,7 @@ namespace dash {
     bool hasVAOFunction = false;
     bool hasRenderData = false;
     std::string _name;
-    // Texture *texture;
+    GLTexture *_texture;
     unsigned int _VBO = 0, _VAO = 0, _EBO = 0;
     GLShader *_shader;
     std::function<void(GLRenderTarget*)> _render;
@@ -39,7 +41,7 @@ namespace dash {
   public:
     GLRenderTargetBuilder();
     GLRenderTargetBuilder *withName(std::string name);
-    GLRenderTargetBuilder *withTexture(/*Texture *texture*/); // TODO: implement this + texture class
+    GLRenderTargetBuilder *withTexture(GLTexture *texture = nullptr);
     GLRenderTargetBuilder *withBuffers(unsigned int VBO, unsigned int VAO, unsigned int EBO);
     GLRenderTargetBuilder *usingDynamicDraw(unsigned int vertexCount, unsigned int indexCount);
     GLRenderTargetBuilder *withShader(GLShader *shader);

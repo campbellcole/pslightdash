@@ -16,6 +16,8 @@
 #include <cstdlib>
 #endif
 
+#include "dbg.h"
+
 #include <string>
 
 std::string getResourcePath(const std::string &filename);

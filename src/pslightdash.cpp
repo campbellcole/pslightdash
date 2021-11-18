@@ -19,8 +19,9 @@ int main() {
 
   renderer->initialize();
 
-  auto *test = new dash::impl::TestRenderTarget();
-  context->addTarget(test->getInstance());
+  auto *test = new dash::impl::Test3D();
+  auto *testTarget = test->build();
+  context->addTarget(testTarget);
 
   auto *testFont = new dash::GLFont("VCR_MONO", 24);
   auto *testText = new dash::impl::Text(testFont, "PSLIGHTDASH", 25, 25, 1, glm::vec3(1, 1, 1));
@@ -32,7 +33,7 @@ int main() {
   delete renderer;
   delete context;
   delete test;
-  delete testText;
+  delete testFont;
   delete rtarget;
 
   return 0;

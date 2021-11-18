@@ -18,7 +18,7 @@ namespace dash::impl {
     };
     unsigned int vertexCount = 32, indexCount = 6;
     GLRenderTargetBuilder targetBuilder;
-    auto built = targetBuilder.withName("test").withVAORegisterFunction([] {
+    auto built = targetBuilder.withName("bg").withVAORegisterFunction([] {
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) 0);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
@@ -27,10 +27,10 @@ namespace dash::impl {
         glEnableVertexAttribArray(2);
       }).withRenderData(vertices, indices, vertexCount, indexCount)
       .withRenderFunction([indexCount](GLRenderTarget *target) {
-        glBindTexture(GL_TEXTURE_2D, target->getTexture()->getTextureID());
+        //glBindTexture(GL_TEXTURE_2D, target->getTexture()->getTextureID());
         glBindVertexArray(target->getVAO());
         glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
-      }).withTexture()
+      })//.withTexture()
       .build();
     return built;
   }

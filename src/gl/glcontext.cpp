@@ -46,6 +46,7 @@ namespace dash {
 
     glViewport(0, 0, iWidth, iHeight);
     glEnable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     b_initialized = true;
@@ -113,7 +114,7 @@ namespace dash {
         frameCount = 0;
         prevTime = currentTime;
       }
-      glClear(GL_COLOR_BUFFER_BIT);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       glClearColor(0.3, 0.0, 0.8, 1.0);
 
       for (map_iter it = targetsByShader.begin(), end = targetsByShader.end(); it != end; it = targetsByShader.upper_bound(it->first)) {

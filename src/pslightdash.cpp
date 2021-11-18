@@ -22,11 +22,18 @@ int main() {
   auto *test = new dash::impl::TestRenderTarget();
   context->addTarget(test->getInstance());
 
+  auto *testFont = new dash::GLFont("VCR_MONO", 24);
+  auto *testText = new dash::impl::Text(testFont, "PSLIGHTDASH", 25, 25, 1, glm::vec3(1, 1, 1));
+  auto *rtarget = testText->build();
+  context->addTarget(rtarget);
+
   renderer->start();
 
   delete renderer;
   delete context;
   delete test;
+  delete testText;
+  delete rtarget;
 
   return 0;
 }

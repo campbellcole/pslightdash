@@ -15,7 +15,7 @@ namespace dash::impl {
     virtual GLRenderTarget *build() = 0;
   public:
     ~BaseRenderTarget() { delete _instance; }
-    virtual GLRenderTarget *getInstance() {
+    GLRenderTarget *getInstance() {
       if (!_instance) this->_instance = this->build();
       return this->_instance;
     }

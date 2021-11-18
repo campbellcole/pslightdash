@@ -40,14 +40,14 @@ namespace dash {
     unsigned int _vertexCount, _indexCount;
   public:
     GLRenderTargetBuilder();
-    GLRenderTargetBuilder *withName(std::string name);
-    GLRenderTargetBuilder *withTexture(GLTexture *texture = nullptr);
-    GLRenderTargetBuilder *withBuffers(unsigned int VBO, unsigned int VAO, unsigned int EBO);
-    GLRenderTargetBuilder *usingDynamicDraw(unsigned int vertexCount, unsigned int indexCount);
-    GLRenderTargetBuilder *withShader(GLShader *shader);
-    GLRenderTargetBuilder *withRenderFunction(std::function<void(GLRenderTarget*)> render);
-    GLRenderTargetBuilder *withVAORegisterFunction(std::function<void()> registerVAO);
-    GLRenderTargetBuilder *withRenderData(float *vertices, unsigned int *indices, unsigned int vertexCount, unsigned int indexCount);
+    GLRenderTargetBuilder withName(std::string name);
+    GLRenderTargetBuilder withTexture(GLTexture *texture = nullptr);
+    GLRenderTargetBuilder withBuffers(unsigned int VBO, unsigned int VAO, unsigned int EBO);
+    GLRenderTargetBuilder usingDynamicDraw(unsigned int vertexCount, unsigned int indexCount);
+    GLRenderTargetBuilder withShader(GLShader *shader);
+    GLRenderTargetBuilder withRenderFunction(std::function<void(GLRenderTarget*)> render);
+    GLRenderTargetBuilder withVAORegisterFunction(std::function<void()> registerVAO);
+    GLRenderTargetBuilder withRenderData(float *vertices, unsigned int *indices, unsigned int vertexCount, unsigned int indexCount);
     GLRenderTarget *build();
   };
 }

@@ -38,5 +38,4 @@ namespace dash {
     return this->_textureID;
   }
 
-
 }

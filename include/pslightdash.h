@@ -12,6 +12,7 @@
 #include "gl/glcontext.h"
 #include "renderer.h"
 #include "dash/testrendertarget.h"
+#include "dash/text.h"
 
 int main();
 

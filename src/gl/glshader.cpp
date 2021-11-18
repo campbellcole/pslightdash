@@ -6,7 +6,7 @@
 
 namespace dash {
   void GLShader::setDefaultUniforms(GLShader *shader, glm::vec2 resolution) {
-    shader->setUFloat("uTime", glfwGetTime()); // todo: find a good place to put this
+    shader->setUFloat("uTime", glfwGetTime());
     shader->setUVec2F("uResolution", resolution.x, resolution.y);
   }
 

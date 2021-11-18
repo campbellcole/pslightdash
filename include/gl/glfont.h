@@ -5,13 +5,50 @@
 #ifndef PSLIGHTDASH_GLFONT_H
 #define PSLIGHTDASH_GLFONT_H
 
+#include <map>
 #include <string>
 
-#include "gl/glcontext.h"
+#include "pslightdashconfig.h"
+#include "gl/glshader.h"
+#include "utils.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glad/glad.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+#define GLYPH_VERTEX_COUNT 16
+#define GLYPH_INDEX_COUNT 6
 
 namespace dash {
+
+  struct Character {
+    unsigned int textureID;
+    glm::ivec2 size;
+    glm::ivec2 bearing;
+    long advance;
+  };
+
   class GLFont {
-    GLFont(const std::string &name, int size, GLContext *glContext);
+  private:
+    static GLShader *defaultFontShader;
+    std::map<char, Character> characters;
+    unsigned int VAO, VBO, EBO;
+  public:
+    static GLShader *getDefaultShader();
+
+    GLFont(const std::string &name, int textSize);
+
+    ~GLFont();
+
+    unsigned int getVAO();
+
+    unsigned int getVBO();
+
+    unsigned int getEBO();
+
+    const std::map<char, Character> *getCharacters();
   };
 }
 

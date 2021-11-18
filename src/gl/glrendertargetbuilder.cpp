@@ -8,59 +8,59 @@ namespace dash {
 
   GLRenderTargetBuilder::GLRenderTargetBuilder() {}
 
-  GLRenderTargetBuilder *GLRenderTargetBuilder::withName(std::string name) {
+  GLRenderTargetBuilder GLRenderTargetBuilder::withName(std::string name) {
     this->named = true;
     this->_name = std::move(name);
-    return this;
+    return *this;
   }
 
-  GLRenderTargetBuilder *GLRenderTargetBuilder::withTexture(GLTexture *texture) {
+  GLRenderTargetBuilder GLRenderTargetBuilder::withTexture(GLTexture *texture) {
     this->textured = true;
     this->_texture = texture;
-    return this;
+    return *this;
   }
 
-  GLRenderTargetBuilder *GLRenderTargetBuilder::withBuffers(unsigned int VBO, unsigned int VAO, unsigned int EBO) {
+  GLRenderTargetBuilder GLRenderTargetBuilder::withBuffers(unsigned int VBO, unsigned int VAO, unsigned int EBO) {
     this->preBuffered = true;
     this->_VBO = VBO;
     this->_VAO = VAO;
     this->_EBO = EBO;
-    return this;
+    return *this;
   }
 
-  GLRenderTargetBuilder *GLRenderTargetBuilder::usingDynamicDraw(unsigned int vertexCount, unsigned int indexCount) {
+  GLRenderTargetBuilder GLRenderTargetBuilder::usingDynamicDraw(unsigned int vertexCount, unsigned int indexCount) {
     this->dynamicDraw = true;
     this->_vertexCount = vertexCount;
     this->_indexCount = indexCount;
-    return this;
+    return *this;
   }
 
-  GLRenderTargetBuilder *GLRenderTargetBuilder::withShader(GLShader *shader) {
+  GLRenderTargetBuilder GLRenderTargetBuilder::withShader(GLShader *shader) {
     this->hasShader = true;
     this->_shader = shader;
-    return this;
+    return *this;
   }
 
-  GLRenderTargetBuilder *GLRenderTargetBuilder::withRenderFunction(std::function<void(GLRenderTarget*)> render) {
+  GLRenderTargetBuilder GLRenderTargetBuilder::withRenderFunction(std::function<void(GLRenderTarget*)> render) {
     this->hasRenderFunction = true;
     this->_render = std::move(render);
-    return this;
+    return *this;
   }
 
-  GLRenderTargetBuilder *GLRenderTargetBuilder::withVAORegisterFunction(std::function<void()> registerVAO) {
+  GLRenderTargetBuilder GLRenderTargetBuilder::withVAORegisterFunction(std::function<void()> registerVAO) {
     this->hasVAOFunction = true;
     this->_registerVAO = std::move(registerVAO);
-    return this;
+    return *this;
   }
 
-  GLRenderTargetBuilder *
+  GLRenderTargetBuilder
   GLRenderTargetBuilder::withRenderData(float *vertices, unsigned int *indices, unsigned int vertexCount, unsigned int indexCount) {
     this->hasRenderData = true;
     this->_vertices = vertices;
     this->_indices = indices;
     this->_vertexCount = vertexCount;
     this->_indexCount = indexCount;
-    return this;
+    return *this;
   }
 
   GLRenderTarget *GLRenderTargetBuilder::build() { // needs some work lul

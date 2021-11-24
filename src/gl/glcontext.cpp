@@ -19,11 +19,11 @@ namespace dash {
     int iHeight = static_cast<int>(this->height);
 
     window = glfwCreateWindow(
-        iWidth,
-        iHeight,
-        "",
-        nullptr,
-        nullptr);
+      iWidth,
+      iHeight,
+      "",
+      nullptr,
+      nullptr);
 
     if (!window) {
       log_err("Failed to create GLFW window, terminating");
@@ -31,8 +31,10 @@ namespace dash {
       exit(1);
     }
 
-    glfwSetWindowUserPointer(window, this);
+    glfwSetWindowUserPointer(window, this); // bind the window to this context
     glfwSetFramebufferSizeCallback(window, GLContext::_handleResize);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, GLContext::_handleMouseMove);
 
     glfwMakeContextCurrent(window);
 
@@ -53,11 +55,11 @@ namespace dash {
     log_info("Initialized OpenGL v%s", glGetString(GL_VERSION));
   }
 
-  int GLContext::getWidth() const {
+  unsigned int GLContext::getWidth() const {
     return this->width;
   }
 
-  int GLContext::getHeight() const {
+  unsigned int GLContext::getHeight() const {
     return this->height;
   }
 
@@ -66,25 +68,23 @@ namespace dash {
   }
 
   void GLContext::addTarget(GLRenderTarget *target) {
-    targetsByShader.insert(std::make_pair(target->getShader(), target));
-    //targets.push_back(target);
+    std::vector<GLRenderTarget *> *targets;
+    if (_targetsByShader.find(target->getShader()) == _targetsByShader.end()) {
+      targets = new std::vector<GLRenderTarget *>();
+      _targetsByShader[target->getShader()] = targets;
+    } else {
+      targets = _targetsByShader[target->getShader()];
+    }
+    targets->push_back(target);
   }
-/* hopefully it's practical to add elements in the right order
-  void GLContext::insertTarget(GLRenderTarget *target, int position) {
-    if ()
-    targets.insert(std::next(targets.begin(), position), target);
-  }
-*/
-  bool GLContext::removeTarget(const std::string &name) { // this can DEFINITELY be optimized
-    for (std::pair<GLShader *const, GLRenderTarget *> pair : targetsByShader) {
-      if (pair.second->getName() == name) {
-        std::pair<map_iter, map_iter> iterpair = targetsByShader.equal_range(pair.first);
-        auto it = iterpair.first;
-        for (; it != iterpair.second; ++it) {
-          if (it->second->getName() == name) {
-            targetsByShader.erase(it);
-            return true;
-          }
+
+  bool GLContext::removeTarget(const std::string &name) {
+    std::vector<GLRenderTarget *>::iterator it;
+    for (auto targets : _targetsByShader) {
+      for (it = targets.second->begin(); it < targets.second->end(); it++) {
+        if ((*it)->getName() == name) {
+          targets.second->erase(it);
+          return true;
         }
       }
     }
@@ -92,7 +92,7 @@ namespace dash {
   }
 
   void GLContext::_handleResize(GLFWwindow *window, int width, int height) {
-    ((GLContext *)glfwGetWindowUserPointer(window))->handleResize(window, width, height); // must set user pointer
+    ((GLContext *) glfwGetWindowUserPointer(window))->handleResize(window, width, height);
   }
 
   void GLContext::handleResize(GLFWwindow *window, int width, int height) {
@@ -101,29 +101,46 @@ namespace dash {
     this->height = height;
   }
 
+  void GLContext::_handleMouseMove(GLFWwindow *window, double x, double y) {
+    ((GLContext *) glfwGetWindowUserPointer(window))->handleMouseMove(window, x, y);
+  }
+
+  void GLContext::handleMouseMove(GLFWwindow *window, double x, double y) {
+    for (auto targets : this->_targetsByShader) {
+      for (auto target : *targets.second) {
+        target->onMouseMove(window, x, y);
+      }
+    }
+  }
+
   void GLContext::start() {
     int frameCount = 0;
     double prevTime = 0.0;
+    double frameDelta = 0.0;
     while (!glfwWindowShouldClose(this->window)) {
       double currentTime = glfwGetTime();
+      frameDelta = currentTime - prevTime;
+      prevTime = currentTime;
       frameCount++;
-      if (currentTime - prevTime >= 1.0) {
-        std::stringstream ss;
-        ss << "PSLIGHTDASH " << pslightdash_VERSION << " [" << frameCount << " FPS]";
-        glfwSetWindowTitle(this->window, ss.str().c_str());
-        frameCount = 0;
-        prevTime = currentTime;
-      }
+      std::stringstream ss;
+      ss << "PSLIGHTDASH " << pslightdash_VERSION << " [" << frameCount << " FPS]";
+      glfwSetWindowTitle(this->window, ss.str().c_str());
+      frameCount = 0;
+      prevTime = currentTime;
+
+      if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(this->window, true);
+
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       glClearColor(0.3, 0.0, 0.8, 1.0);
 
-      for (map_iter it = targetsByShader.begin(), end = targetsByShader.end(); it != end; it = targetsByShader.upper_bound(it->first)) {
-        std::pair<map_iter, map_iter> iterpair = targetsByShader.equal_range(it->first);
-        it->first->use(); // activate shader
-        GLShader::setDefaultUniforms(it->first, glm::vec2(this->getWidth(), this->getHeight()));
-        auto shader_it = iterpair.first;
-        for (; shader_it != iterpair.second; ++shader_it) {
-          shader_it->second->render(this->window);
+      for (auto targets : _targetsByShader) {
+        targets.first->use();
+        GLShader::setDefaultUniforms(targets.first, glm::vec2(this->getWidth(), this->getHeight()));
+        if (!targets.second) continue;
+        for (auto target : *targets.second) {
+          target->checkKeypress(this->window, frameDelta);
+          target->render(this->window);
         }
       }
 

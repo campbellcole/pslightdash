@@ -6,33 +6,37 @@
 
 namespace dash {
   GLRenderTarget::GLRenderTarget(
-      std::string name,
-      unsigned int VBO,
-      unsigned int VAO,
-      unsigned int EBO,
-      bool dynamicDraw,
-      bool manageBuffers,
-      GLShader *shader,
-      GLTexture *texture,
-      std::function<void(GLRenderTarget*)> render,
-      float *vertices,
-      unsigned int *indices,
-      unsigned int vertexCount,
-      unsigned int indexCount)
-      : _enabled(true),
-        _name(std::move(name)),
-        _VBO(VBO),
-        _VAO(VAO),
-        _EBO(EBO),
-        _dynamicDraw(dynamicDraw),
-        _manageBuffers(manageBuffers),
-        _shader(shader),
-        _texture(texture),
-        _renderFunc(std::move(render)),
-        _vertices(vertices),
-        _indices(indices),
-        _vertexCount(vertexCount),
-        _indexCount(indexCount) {}
+    std::string name,
+    unsigned int VBO,
+    unsigned int VAO,
+    unsigned int EBO,
+    bool dynamicDraw,
+    bool manageBuffers,
+    GLShader *shader,
+    GLTexture *texture,
+    std::function<void(GLRenderTarget *)> render,
+    std::function<void(GLFWwindow *,float)> onInput,
+    std::function<void(GLFWwindow *,double,double)> onMouseMove,
+    float *vertices,
+    unsigned int *indices,
+    unsigned int vertexCount,
+    unsigned int indexCount)
+    : _enabled(true),
+      _name(std::move(name)),
+      _VBO(VBO),
+      _VAO(VAO),
+      _EBO(EBO),
+      _dynamicDraw(dynamicDraw),
+      _manageBuffers(manageBuffers),
+      _shader(shader),
+      _texture(texture),
+      _onInputFunc(std::move(onInput)),
+      _renderFunc(std::move(render)),
+      _onMouseMove(std::move(onMouseMove)),
+      _vertices(vertices),
+      _indices(indices),
+      _vertexCount(vertexCount),
+      _indexCount(indexCount) {}
 
   GLRenderTarget::~GLRenderTarget() {
     if (this->_manageBuffers) {
@@ -84,12 +88,25 @@ namespace dash {
     }
   }
 
-  void GLRenderTarget::render(GLFWwindow *window, float *vertices, unsigned int *indices, unsigned int vertexCount, unsigned int indexCount) {
+  void GLRenderTarget::render(GLFWwindow *window, float *vertices, unsigned int *indices, unsigned int vertexCount,
+                              unsigned int indexCount) {
     this->_vertices = vertices;
     this->_indices = indices;
     this->_vertexCount = vertexCount;
     this->_indexCount = indexCount;
     this->render(window);
+  }
+
+  void GLRenderTarget::checkKeypress(GLFWwindow *window, float delta) {
+    if (this->isEnabled()) {
+      this->_onInputFunc(window, delta);
+    }
+  }
+
+  void GLRenderTarget::onMouseMove(GLFWwindow *window, double x, double y) {
+    if (this->isEnabled()) {
+      this->_onMouseMove(window, x, y);
+    }
   }
 
 }

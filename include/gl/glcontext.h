@@ -21,6 +21,7 @@
 namespace dash {
   class GLContext {
   private:
+    std::map<GLShader *, std::vector<GLRenderTarget *>*> _targetsByShader;
     std::multimap<GLShader *, GLRenderTarget *> targetsByShader;
     typedef std::multimap<GLShader *, GLRenderTarget *>::iterator map_iter;
 
@@ -31,6 +32,8 @@ namespace dash {
     GLFWwindow *window;
 
     static void _handleResize(GLFWwindow *window, int width, int height);
+
+    static void _handleMouseMove(GLFWwindow *window, double x, double y);
   public:
     GLContext(unsigned int width, unsigned int height);
 
@@ -46,9 +49,11 @@ namespace dash {
 
     void handleResize(GLFWwindow *window, int width, int height);
 
-    int getWidth() const;
+    void handleMouseMove(GLFWwindow *window, double x, double y);
 
-    int getHeight() const;
+    unsigned int getWidth() const;
+
+    unsigned int getHeight() const;
 
     bool initialized() const;
   };

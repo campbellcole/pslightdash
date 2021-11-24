@@ -11,12 +11,12 @@
 namespace dash::impl {
   class BaseRenderTarget {
   protected:
-    GLRenderTarget *_instance;
+    GLRenderTarget *_instance = nullptr;
     virtual GLRenderTarget *build() = 0;
   public:
     ~BaseRenderTarget() { delete _instance; }
     GLRenderTarget *getInstance() {
-      if (!_instance) this->_instance = this->build();
+      if (!this->_instance) this->_instance = this->build();
       return this->_instance;
     }
   };

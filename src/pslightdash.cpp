@@ -20,7 +20,7 @@ int main() {
   renderer->initialize();
 
   auto *test = new dash::impl::Test3D();
-  auto *testTarget = test->build();
+  auto *testTarget = test->getInstance();
   context->addTarget(testTarget);
 
   auto *testFont = new dash::GLFont("VCR_MONO", 24);

@@ -42,26 +42,55 @@ namespace dash::impl {
     unsigned int vertexCount = 80, indexCount = 36;
     GLRenderTargetBuilder targetBuilder;
     auto built = targetBuilder.withName("3d")
-      .withVAORegisterFunction([]{
+      .withVAORegisterFunction([] {
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) 0);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
         glEnableVertexAttribArray(1);
       }).withRenderData(vertices, indices, vertexCount, indexCount)
       .withRenderFunction([this, indexCount](GLRenderTarget *target) {
+        this->direction.x = cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
+        this->direction.y = sin(glm::radians(this->pitch));
+        this->direction.z = sin(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
+        this->cameraFront = glm::normalize(this->direction);
+        this->view = glm::lookAt(this->cameraPos, this->cameraPos + this->cameraFront, this->cameraUp);
+
+        target->getShader()->setUMat4F("view", this->view);
+        target->getShader()->setUMat4F("projection", this->projection);
+
+        glBindTexture(GL_TEXTURE_2D, target->getTexture()->getTextureID());
+        glBindVertexArray(target->getVAO());
+
         for (unsigned int i = 0; i < 10; i++) {
           auto model = glm::mat4(1.0f);
           model = glm::translate(model, glm::vec3(cubePositions[i]));
-          cubePositions[i].w += 0.1*(i+1);
+          cubePositions[i].w += 0.1 * (i + 1);
           model = glm::rotate(model, glm::radians(cubePositions[i].w), glm::vec3(1.0f, 0.3f, 0.5f));
+
           target->getShader()->setUMat4F("model", model);
-          target->getShader()->setUMat4F("view", this->view);
-          target->getShader()->setUMat4F("projection", this->projection);
-          glBindTexture(GL_TEXTURE_2D, target->getTexture()->getTextureID());
-          glBindVertexArray(target->getVAO());
           glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
         }
-      }).withTexture()
+      }).withKeypressCheckFunction([this](GLFWwindow *window, float delta) {
+        float movementDelta = this->CAMERA_SPEED * delta;
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+          this->cameraPos += movementDelta * this->cameraFront;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+          this->cameraPos -= movementDelta * this->cameraFront;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+          this->cameraPos -= glm::normalize(glm::cross(this->cameraFront, this->cameraUp)) * movementDelta;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+          this->cameraPos += glm::normalize(glm::cross(this->cameraFront, this->cameraUp)) * movementDelta;
+      }).withMouseMovementCallback([this](GLFWwindow *window, double x, double y) {
+        this->yaw += (x - this->lastX) * this->MOUSE_SENSITIVITY;
+        this->pitch += (this->lastY - y) * this->MOUSE_SENSITIVITY;
+        this->lastX = x;
+        this->lastY = y;
+        if (this->pitch > 89.0f)
+          this->pitch = 89.0f;
+        if (this->pitch < -89.0f)
+          this->pitch = -89.0f;
+      })
+      .withTexture()
       .build();
     return built;
   }

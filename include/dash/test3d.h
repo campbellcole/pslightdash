@@ -13,7 +13,17 @@
 namespace dash::impl {
   class Test3D: public BaseRenderTarget {
   private:
+    const float CAMERA_SPEED = 2.5f, MOUSE_SENSITIVITY = 0.1f;
+    float lastX = 0.0f, lastY = 0.0f, pitch = 0.0f, yaw = -90.0f;
     glm::mat4 model, view, projection;
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f),
+      cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f),
+      cameraDirection = glm::normalize(cameraPos - cameraTarget),
+      up = glm::vec3(0.0f, 1.0f, 0.0f),
+      cameraRight = glm::normalize(glm::cross(up, cameraDirection)),
+      cameraUp = glm::cross(cameraDirection, cameraRight),
+      cameraFront = glm::vec3(0.0f, 0.0f, -1.0f),
+      direction = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec4 cubePositions[10] = {
       glm::vec4( 0.0f,  0.0f,  0.0f, 0.0f),
       glm::vec4( 2.0f,  5.0f, -15.0f, 0.0f),

@@ -1,5 +1,5 @@
 #version 330 core
-#define PI 3.1415926538
+#define PI 3.1415926535
 
 #define A 0.5
 #define B 2.0

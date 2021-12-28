@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#ifndef AUDIOFFT_APPLE_ACCELERATE
+#if defined(__APPLE__) && !defined(AUDIOFFT_APPLE_ACCELERATE)
 #define AUDIOFFT_APPLE_ACCELERATE
 #endif
 #include "AudioFFT.h"

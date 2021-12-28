@@ -18,7 +18,7 @@
 #include <list>
 #include <map>
 
-namespace dash {
+namespace dash::gl {
   class GLContext {
   private:
     std::map<GLShader *, std::vector<GLRenderTarget *>*> _targetsByShader;

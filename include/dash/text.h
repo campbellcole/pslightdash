@@ -17,6 +17,8 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
+using dash::gl::GLFont;
+
 namespace dash::impl {
   class Text : public BaseRenderTarget {
   private:

@@ -4,7 +4,7 @@
 
 #include "gl/gltexture.h"
 
-namespace dash {
+namespace dash::gl {
   void GLTexture::DEFAULT_TEXTURE_LOAD(unsigned int &textureID, std::string &filename) {
     debug("Loading texture: %s", filename.c_str());
     glGenTextures(1, &textureID);

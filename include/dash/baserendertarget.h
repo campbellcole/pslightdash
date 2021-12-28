@@ -8,6 +8,8 @@
 #include "gl/glrendertargetbuilder.h"
 #include "gl/glrendertarget.h"
 
+using namespace dash::gl;
+
 namespace dash::impl {
   class BaseRenderTarget {
   protected:

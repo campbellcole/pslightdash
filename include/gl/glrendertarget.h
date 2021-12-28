@@ -16,7 +16,7 @@
 #include <vector>
 #include <utility>
 
-namespace dash {
+namespace dash::gl {
   class GLRenderTarget {
   protected:
     bool _enabled, _dynamicDraw, _manageBuffers;

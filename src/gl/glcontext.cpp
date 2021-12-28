@@ -4,7 +4,7 @@
 
 #include "gl/glcontext.h"
 
-namespace dash {
+namespace dash::gl {
   GLContext::GLContext(unsigned int width, unsigned int height) : width(width), height(height) {}
 
   void GLContext::initialize() {

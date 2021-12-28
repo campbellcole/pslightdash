@@ -19,7 +19,7 @@
 #include "GLFW/glfw3.h"
 #include <glm/glm.hpp>
 
-namespace dash {
+namespace dash::gl {
   class GLShader {
   private:
     unsigned int ID;

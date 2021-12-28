@@ -10,6 +10,8 @@
 #include "pslightdashconfig.h"
 #include "gl/glcontext.h"
 
+using dash::gl::GLContext;
+
 namespace dash {
   class Renderer {
   private:

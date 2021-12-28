@@ -4,7 +4,7 @@
 
 #include "gl/glrendertarget.h"
 
-namespace dash {
+namespace dash::gl {
   GLRenderTarget::GLRenderTarget(
     std::string name,
     unsigned int VBO,

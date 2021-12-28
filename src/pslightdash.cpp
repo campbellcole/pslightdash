@@ -16,20 +16,18 @@ int main() {
   mp3dec_t dec;
   mp3dec_init(&dec);
 
-  auto *context = new dash::GLContext(pslightdash_WINDOW_WIDTH, pslightdash_WINDOW_HEIGHT);
+  auto *context = new dash::gl::GLContext(pslightdash_WINDOW_WIDTH, pslightdash_WINDOW_HEIGHT);
 
   auto *renderer = new dash::Renderer(context);
 
   renderer->initialize();
 
   auto *test = new dash::impl::Test3D();
-  auto *testTarget = test->getInstance();
-  context->addTarget(testTarget);
+  context->addTarget(test->getInstance());
 
-  auto *testFont = new dash::GLFont("VCR_MONO", 24);
+  auto *testFont = new dash::gl::GLFont("VCR_MONO", 24);
   auto *testText = new dash::impl::Text(testFont, "PSLIGHTDASH", 25, 25, 1, glm::vec3(1, 1, 1));
-  auto *rtarget = testText->getInstance();
-  context->addTarget(rtarget);
+  context->addTarget(testText->getInstance());
 
   renderer->start();
 

@@ -15,7 +15,7 @@
 #include <string>
 #include <functional>
 
-namespace dash {
+namespace dash::gl {
 
   class GLTexture {
   private:

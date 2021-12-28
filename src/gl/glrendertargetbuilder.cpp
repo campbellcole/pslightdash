@@ -4,7 +4,7 @@
 
 #include "gl/glrendertargetbuilder.h"
 
-namespace dash {
+namespace dash::gl {
 
   GLRenderTargetBuilder::GLRenderTargetBuilder() {}
 

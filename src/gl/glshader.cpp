@@ -4,7 +4,7 @@
 
 #include "gl/glshader.h"
 
-namespace dash {
+namespace dash::gl {
   void GLShader::setDefaultUniforms(GLShader *shader, glm::vec2 resolution) {
     shader->setUFloat("uTime", glfwGetTime());
     shader->setUVec2F("uResolution", resolution.x, resolution.y);

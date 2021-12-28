@@ -4,7 +4,7 @@
 
 #include "gl/glfont.h"
 
-namespace dash {
+namespace dash::gl {
   GLShader *GLFont::defaultFontShader = nullptr;
 
   GLShader *GLFont::getDefaultShader() {

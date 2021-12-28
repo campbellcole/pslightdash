@@ -21,7 +21,7 @@
 #define GLYPH_VERTEX_COUNT 16
 #define GLYPH_INDEX_COUNT 6
 
-namespace dash {
+namespace dash::gl {
 
   struct Character {
     unsigned int textureID;

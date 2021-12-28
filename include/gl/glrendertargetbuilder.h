@@ -18,7 +18,7 @@
 #include <vector>
 #include <utility>
 
-namespace dash {
+namespace dash::gl {
   class GLRenderTargetBuilder {
   private:
     bool named = false;

@@ -37,6 +37,7 @@ namespace dash {
     glfwSetCursorPosCallback(window, GLContext::_handleMouseMove);
 
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(0); // uncomment to disable vsync
 
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
       log_err("Failed to initialize OpenGL");
@@ -117,16 +118,20 @@ namespace dash {
     int frameCount = 0;
     double prevTime = 0.0;
     double frameDelta = 0.0;
+    double deltaAcc = 0.0;
     while (!glfwWindowShouldClose(this->window)) {
       double currentTime = glfwGetTime();
       frameDelta = currentTime - prevTime;
       prevTime = currentTime;
+      deltaAcc += frameDelta;
       frameCount++;
-      std::stringstream ss;
-      ss << "PSLIGHTDASH " << pslightdash_VERSION << " [" << frameCount << " FPS]";
-      glfwSetWindowTitle(this->window, ss.str().c_str());
-      frameCount = 0;
-      prevTime = currentTime;
+      if (deltaAcc >= 1.0) {
+        std::stringstream ss;
+        ss << "PSLIGHTDASH " << pslightdash_VERSION << " [" << frameCount << " FPS]";
+        glfwSetWindowTitle(this->window, ss.str().c_str());
+        frameCount = 0;
+        deltaAcc = 0.0;
+      }
 
       if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(this->window, true);

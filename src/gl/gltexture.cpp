@@ -10,8 +10,8 @@ namespace dash {
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -20,7 +20,25 @@ namespace dash {
     int width, height, nChannels;
     unsigned char *data = stbi_load(resPath.c_str(), &width, &height, &nChannels, 0);
     if (data) {
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+      GLenum imgFmt;
+      switch (nChannels) {
+        case 1:
+          imgFmt = GL_RED;
+          break;
+        case 2:
+          imgFmt = GL_RG;
+          break;
+        case 3:
+          imgFmt = GL_RGB;
+          break;
+        case 4:
+          imgFmt = GL_RGBA;
+          break;
+        default:
+          imgFmt = GL_RGB;
+          break;
+      }
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, imgFmt, GL_UNSIGNED_BYTE, data);
       glGenerateMipmap(GL_TEXTURE_2D);
     } else {
       log_err("Failed to load texture: %s", filename.c_str());

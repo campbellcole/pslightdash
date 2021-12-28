@@ -13,6 +13,9 @@ int main() {
   log_info("DEBUG ENABLED");
 #endif
 
+  mp3dec_t dec;
+  mp3dec_init(&dec);
+
   auto *context = new dash::GLContext(pslightdash_WINDOW_WIDTH, pslightdash_WINDOW_HEIGHT);
 
   auto *renderer = new dash::Renderer(context);
@@ -25,7 +28,7 @@ int main() {
 
   auto *testFont = new dash::GLFont("VCR_MONO", 24);
   auto *testText = new dash::impl::Text(testFont, "PSLIGHTDASH", 25, 25, 1, glm::vec3(1, 1, 1));
-  auto *rtarget = testText->build();
+  auto *rtarget = testText->getInstance();
   context->addTarget(rtarget);
 
   renderer->start();
@@ -34,7 +37,7 @@ int main() {
   delete context;
   delete test;
   delete testFont;
-  delete rtarget;
+  delete testText;
 
   return 0;
 }

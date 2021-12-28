@@ -61,21 +61,27 @@ namespace dash::impl {
         glBindTexture(GL_TEXTURE_2D, target->getTexture()->getTextureID());
         glBindVertexArray(target->getVAO());
 
-        for (unsigned int i = 0; i < 10; i++) {
-          auto model = glm::mat4(1.0f);
-          model = glm::translate(model, glm::vec3(cubePositions[i]));
-          cubePositions[i].w += 0.1 * (i + 1);
-          model = glm::rotate(model, glm::radians(cubePositions[i].w), glm::vec3(1.0f, 0.3f, 0.5f));
+        for (unsigned int x = 0; x < 10; x++) {
+          for (unsigned int z = 0; z < 10; z++) {
+            auto model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(x, 0.0, z));
+            //cubePositions[x].w += 0.1 * (x + 1);
+            //model = glm::rotate(model, glm::radians(cubePositions[x].w), glm::vec3(1.0f, 0.3f, 0.5f));
 
-          target->getShader()->setUMat4F("model", model);
-          glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+            target->getShader()->setUMat4F("model", model);
+            glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+          }
         }
       }).withKeypressCheckFunction([this](GLFWwindow *window, float delta) {
-        float movementDelta = this->CAMERA_SPEED * delta;
+        float movementDelta = this->CAMERA_SPEED * delta * ((glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) ? 3.0 : 1.0);
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-          this->cameraPos += movementDelta * this->cameraFront;
+          this->cameraPos += movementDelta * glm::vec3(this->direction.x, 0.0, this->direction.z);
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-          this->cameraPos -= movementDelta * this->cameraFront;
+          this->cameraPos -= movementDelta * glm::vec3(this->direction.x, 0.0, this->direction.z);;
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+          this->cameraPos += movementDelta * this->cameraUp;
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+          this->cameraPos -= movementDelta * this->cameraUp;
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
           this->cameraPos -= glm::normalize(glm::cross(this->cameraFront, this->cameraUp)) * movementDelta;
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)

@@ -7,6 +7,15 @@
 
 #include <iostream>
 
+#ifndef AUDIOFFT_APPLE_ACCELERATE
+#define AUDIOFFT_APPLE_ACCELERATE
+#endif
+#include "AudioFFT.h"
+#ifndef MINIMP3_IMPLEMENTATION
+#define MINIMP3_IMPLEMENTATION
+#endif
+#include <minimp3/minimp3.h>
+
 #include "dbg.h"
 #include "pslightdashconfig.h"
 #include "gl/glcontext.h"

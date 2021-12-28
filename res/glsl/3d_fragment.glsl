@@ -14,11 +14,11 @@ out vec4 FragColor;
 uniform float uTime;
 uniform sampler2D sample0;
 
-in vec3 vertexColor;
 in vec2 texCoord;
 
 void main()
 {
-  vec4 color = vec4((A * cos(B * uTime + C1) / D + K) * vertexColor.x, (A * cos(B * uTime + C2) + K) * vertexColor.y, (A * cos(B * uTime + C3) + K) * vertexColor.z, 1.);
-  FragColor = texture(sample0, texCoord * ((sin(uTime) + 1.0) / 2.0 * 5 + 1)) + color;
+  //vec4 color = vec4((A * cos(B * uTime + C1) / D + K) * 0.5, (A * cos(B * uTime + C2) + K) * .1, (A * cos(B * uTime + C3) + K) * 1.0, 1.);
+  vec2 newCoord = vec2(texCoord.x + (floor(cos(uTime) * 16) / 16), texCoord.y + (floor(sin(uTime) * 16) / 16));
+  FragColor = texture(sample0, newCoord);// + color;
 }

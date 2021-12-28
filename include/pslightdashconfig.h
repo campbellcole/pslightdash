@@ -8,7 +8,7 @@
 
 #define pslightdash_VERSION pslightdash_BUILD_TYPE "_v" pslightdash_VERSION_MAJOR "." pslightdash_VERSION_MINOR "." pslightdash_VERSION_PATCH
 
-#define pslightdash_WINDOW_WIDTH 800
-#define pslightdash_WINDOW_HEIGHT 600
+#define pslightdash_WINDOW_WIDTH 1600
+#define pslightdash_WINDOW_HEIGHT 800
 
 #endif // PSLIGHTDASHCONFIG_H

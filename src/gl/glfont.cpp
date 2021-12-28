@@ -91,6 +91,7 @@ namespace dash {
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
+    debug("Loaded font: %s", name.c_str());
   }
 
   GLFont::~GLFont() {

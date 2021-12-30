@@ -19,17 +19,17 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // ==================================================================================
 
-#include "AudioFFT.h"
+#include "dash/vis/AudioFFT.h"
+#include "dbg.h"
 
 #include <cassert>
 #include <cmath>
 #include <cstring>
 
-
 #if defined(AUDIOFFT_INTEL_IPP)
 #define AUDIOFFT_INTEL_IPP_USED
   #include <ipp.h>
-#elif defined(AUDIOFFT_APPLE_ACCELERATE)
+#elif defined(__APPLE__)
 #define AUDIOFFT_APPLE_ACCELERATE_USED
   #include <Accelerate/Accelerate.h>
   #include <vector>
@@ -963,6 +963,7 @@ namespace audiofft
 
     virtual void init(size_t size) override
     {
+      debug("Using Accelerate framework for FFT");
       if (_fftSetup)
       {
         vDSP_destroy_fftsetup(_fftSetup);

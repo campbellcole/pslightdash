@@ -74,6 +74,15 @@ namespace dash::gl {
     return *this;
   }
 
+  GLRenderTargetBuilder GLRenderTargetBuilder::withRenderData(Primitive primitive) {
+    return this->withRenderData(
+      primitive.vertices,
+      primitive.indices,
+      primitive.vertexCount,
+      primitive.indexCount
+    );
+  }
+
   GLRenderTarget *GLRenderTargetBuilder::build() { // needs some work lul
     if (!this->preBuffered) {
       if (!this->dynamicDraw && !this->hasRenderData) {

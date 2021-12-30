@@ -9,6 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "baserendertarget.h"
+#include "primitives/primitives.h"
 
 namespace dash::impl {
   class Test3D: public BaseRenderTarget {

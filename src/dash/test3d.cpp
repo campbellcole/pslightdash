@@ -7,39 +7,6 @@
 namespace dash::impl {
 
   GLRenderTarget *Test3D::build() {
-    unsigned int indices[] = {
-      0,1,2,
-      2,3,0,
-      4,5,6,
-      6,7,4,
-      8,9,10,
-      10,4,8,
-      11,2,12,
-      12,13,11,
-      10,14,5,
-      5,4,10,
-      3,2,11,
-      11,15,3
-    };
-    float vertices[] = {
-      -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, //0
-      0.5f, -0.5f, -0.5f,  1.0f, 0.0f, //1
-      0.5f,  0.5f, -0.5f,  1.0f, 1.0f, //2
-      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, //3
-      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, //4
-      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,//5
-      0.5f,  0.5f,  0.5f,  1.0f, 1.0f,//6
-      -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,//7
-      -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,//8
-      -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,//9
-      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,//10
-      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,//11
-      0.5f, -0.5f, -0.5f,  0.0f, 1.0f,//12
-      0.5f, -0.5f,  0.5f,  0.0f, 0.0f,//13
-      0.5f, -0.5f, -0.5f,  1.0f, 1.0f,//14
-      -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,//15
-    };
-    unsigned int vertexCount = 80, indexCount = 36;
     GLRenderTargetBuilder targetBuilder;
     auto built = targetBuilder.withName("3d")
       .withVAORegisterFunction([] {
@@ -47,8 +14,12 @@ namespace dash::impl {
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
         glEnableVertexAttribArray(1);
-      }).withRenderData(vertices, indices, vertexCount, indexCount)
-      .withRenderFunction([this, indexCount](GLRenderTarget *target) {
+      }).withRenderData(
+        dash::primitives::TEXTURED_CUBE.vertices,
+        dash::primitives::TEXTURED_CUBE.indices,
+        dash::primitives::TEXTURED_CUBE.vertexCount,
+        dash::primitives::TEXTURED_CUBE.indexCount)
+      .withRenderFunction([this](GLRenderTarget *target) {
         this->direction.x = cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
         this->direction.y = sin(glm::radians(this->pitch));
         this->direction.z = sin(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
@@ -69,7 +40,7 @@ namespace dash::impl {
             //model = glm::rotate(model, glm::radians(cubePositions[x].w), glm::vec3(1.0f, 0.3f, 0.5f));
 
             target->getShader()->setUMat4F("model", model);
-            glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, dash::primitives::TEXTURED_CUBE.indexCount, GL_UNSIGNED_INT, 0);
           }
         }
       }).withKeypressCheckFunction([this](GLFWwindow *window, float delta) {

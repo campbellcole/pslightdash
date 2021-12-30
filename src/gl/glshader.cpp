@@ -11,7 +11,7 @@ namespace dash::gl {
   }
 
   GLShader::GLShader(std::string name)
-      : GLShader(name, (name + "_vertex.glsl"), (name + "_fragment.glsl")) {}
+    : GLShader(name, (name + "_vertex.glsl"), (name + "_fragment.glsl")) {}
 
   GLShader::GLShader(std::string name, std::string vertexFilename, std::string fragmentFilename) {
     std::string vertexShader, fragmentShader;
@@ -116,4 +116,6 @@ namespace dash::gl {
   void GLShader::setUMat4F(const std::string &name, glm::mat4 &value) {
     glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &value[0][0]);
   }
+
+
 }

@@ -17,6 +17,7 @@
 #include <functional>
 #include <vector>
 #include <utility>
+#include <primitives/primitives.h>
 
 namespace dash::gl {
   class GLRenderTargetBuilder {
@@ -54,6 +55,7 @@ namespace dash::gl {
     GLRenderTargetBuilder withMouseMovementCallback(std::function<void(GLFWwindow*,double,double)> onMouseMove);
     GLRenderTargetBuilder withVAORegisterFunction(std::function<void()> registerVAO);
     GLRenderTargetBuilder withRenderData(float *vertices, unsigned int *indices, unsigned int vertexCount, unsigned int indexCount);
+    GLRenderTargetBuilder withRenderData(Primitive primitive);
     GLRenderTarget *build();
   };
 }

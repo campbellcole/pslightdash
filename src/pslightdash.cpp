@@ -1,4 +1,14 @@
-﻿#include "pslightdash.h"
+﻿#include <iostream>
+
+#include "dbg.h"
+#include "pslightdashconfig.h"
+#include "gl/glcontext.h"
+#include "renderer.h"
+#include "dash/testrendertarget.h"
+#include "dash/test3d.h"
+#include "dash/vis/dashvis.h"
+#include "dash/text.h"
+#include "pslightdash.h"
 
 int main() {
   const char *pslightdash = "'||''|.   .|'''.|  '||'      '||'  ..|'''.|  '||'  '||' |''||''| '||'''|.      |      .|'''.|  '||'  '||' \n"
@@ -13,16 +23,13 @@ int main() {
   log_info("DEBUG ENABLED");
 #endif
 
-  mp3dec_t dec;
-  mp3dec_init(&dec);
-
   auto *context = new dash::gl::GLContext(pslightdash_WINDOW_WIDTH, pslightdash_WINDOW_HEIGHT);
 
   auto *renderer = new dash::Renderer(context);
 
   renderer->initialize();
 
-  auto *test = new dash::impl::Test3D();
+  auto *test = new dash::impl::DashVis();
   context->addTarget(test->getInstance());
 
   auto *testFont = new dash::gl::GLFont("VCR_MONO", 24);

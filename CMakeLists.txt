@@ -37,6 +37,8 @@ if(APPLE)
 endif()
 find_package(OpenSSL REQUIRED)
 target_link_libraries(pslightdash PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+find_package(SDL2 CONFIG REQUIRED)
+target_link_libraries(pslightdash PRIVATE SDL2::SDL2 SDL2::SDL2main SDL2::SDL2-static)
 
 add_custom_command(TARGET pslightdash PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/res/ $<TARGET_FILE_DIR:pslightdash>/res/)
 

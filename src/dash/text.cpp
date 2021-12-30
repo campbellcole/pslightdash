@@ -8,6 +8,10 @@ namespace dash::impl {
   Text::Text(GLFont *font, std::string text, float x, float y, float scale, glm::vec3 color)
     : font(font), text(std::move(text)), x(x), y(y), scale(scale), color(color) {}
 
+  void Text::setText(std::string _text) {
+    this->text = std::move(_text);
+  }
+
   GLRenderTarget *Text::build() {
     GLRenderTargetBuilder builder;
     auto built = builder.withBuffers(this->font->getVBO(), this->font->getVAO(), this->font->getEBO())

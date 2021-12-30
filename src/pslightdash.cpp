@@ -3,7 +3,6 @@
 #include "dbg.h"
 #include "pslightdashconfig.h"
 #include "gl/glcontext.h"
-#include "renderer.h"
 #include "dash/testrendertarget.h"
 #include "dash/test3d.h"
 #include "dash/vis/dashvis.h"
@@ -24,21 +23,17 @@ int main() {
 #endif
 
   auto *context = new dash::gl::GLContext(pslightdash_WINDOW_WIDTH, pslightdash_WINDOW_HEIGHT);
-
-  auto *renderer = new dash::Renderer(context);
-
-  renderer->initialize();
-
-  auto *test = new dash::impl::DashVis();
-  context->addTarget(test->getInstance());
+  context->initialize();
 
   auto *testFont = new dash::gl::GLFont("VCR_MONO", 24);
-  auto *testText = new dash::impl::Text(testFont, "PSLIGHTDASH", 25, 25, 1, glm::vec3(1, 1, 1));
+  auto *testText = new dash::impl::Text(testFont, "PSLIGHTDASH", 25, 25, 1, glm::vec3(1, 0, 1));
   context->addTarget(testText->getInstance());
 
-  renderer->start();
+  auto *test = new dash::impl::DashVis(context->getWindow(), testText);
+  context->addTarget(test->getInstance());
 
-  delete renderer;
+  context->start();
+
   delete context;
   delete test;
   delete testFont;

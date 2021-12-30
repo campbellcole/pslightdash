@@ -949,8 +949,7 @@ namespace audiofft
       _powerOf2(0),
       _fftSetup(0),
       _re(),
-      _im(),
-      _data()
+      _im()
     {
     }
 
@@ -973,7 +972,6 @@ namespace audiofft
         _fftSetup = 0;
         _re.clear();
         _im.clear();
-        _data.clear();
       }
 
       if (size > 0)
@@ -987,7 +985,6 @@ namespace audiofft
         _fftSetup = vDSP_create_fftsetup(_powerOf2, FFT_RADIX2);
         _re.resize(_size / 2);
         _im.resize(_size / 2);
-        _data.resize(_size);
       }
     }
 
@@ -997,10 +994,6 @@ namespace audiofft
       DSPSplitComplex splitComplex;
       splitComplex.realp = re;
       splitComplex.imagp = im;
-      for (size_t i = 0; i < _size-1; i+=2) {
-        _data[i] = data[i];
-        _data[i+1] = 0.0f;
-      }
       vDSP_ctoz(reinterpret_cast<const COMPLEX*>(data), 2, &splitComplex, 1, size2);
       vDSP_fft_zrip(_fftSetup, &splitComplex, 1, _powerOf2, FFT_FORWARD);
       const float factor = 0.5f;
@@ -1030,7 +1023,6 @@ namespace audiofft
     size_t _size;
     size_t _powerOf2;
     FFTSetup _fftSetup;
-    std::vector<float> _data;
     std::vector<float> _re;
     std::vector<float> _im;
   };

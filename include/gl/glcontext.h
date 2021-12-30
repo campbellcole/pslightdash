@@ -55,6 +55,8 @@ namespace dash::gl {
 
     unsigned int getHeight() const;
 
+    GLFWwindow *getWindow() const;
+
     bool initialized() const;
   };
 }

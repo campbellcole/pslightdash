@@ -64,6 +64,14 @@ namespace dash::gl {
     return this->height;
   }
 
+  GLFWwindow *GLContext::getWindow() const {
+    if (this->window == nullptr) {
+      log_err("Attempted to get window from uninitialized context. Throwing.");
+      throw std::runtime_error("Context not yet initialized");
+    }
+    return this->window;
+  }
+
   bool GLContext::initialized() const {
     return this->b_initialized;
   }

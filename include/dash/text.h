@@ -23,12 +23,13 @@ namespace dash::impl {
   class Text : public BaseRenderTarget {
   private:
     GLFont *font;
-    const std::string text;
+    std::string text;
     float x, y, scale;
     glm::vec3 color;
     const int DEFAULT_INDICES[6] {0, 1, 2, 0, 2, 3};
   public:
     Text(GLFont *font, std::string text, float x, float y, float scale, glm::vec3 color);
+    void setText(std::string _text);
     GLRenderTarget *build() override;
   };
 }

@@ -10,18 +10,25 @@
 #include "dash/vis/AudioFFT.h"
 
 #include "dash/baserendertarget.h"
+#include "dash/text.h"
+
 #include "dash/vis/decode.h"
 #include "dash/vis/audio_sdl.h"
+
 #include "primitives/primitives.h"
+
+#include <GLFW/glfw3.h>
 
 namespace dash::impl {
   class DashVis: public BaseRenderTarget {
   private:
+    GLFWwindow *window;
+    impl::Text *statusTarget;
     audiofft::AudioFFT *fft;
     bool playing = false;
     void *render;
     decoder dec;
-    double lastPlayToggle;
+    int lastKeyState = GLFW_RELEASE, keyState = GLFW_RELEASE;
     float sideLength = 0.0;
     GLShape pointShape = primitives::TEXTURED_CUBE(0.01, sideLength);
     const float CAMERA_SPEED = 3.5f, MOUSE_SENSITIVITY = 0.1f;
@@ -39,8 +46,10 @@ namespace dash::impl {
       cameraFront = glm::vec3(0.0f, 0.0f, -1.0f),
       direction = glm::vec3(0.0f, 0.0f, 0.0f);
     std::vector<float> *re, *im = re = nullptr;
+    bool captureEnabled = true;
+    void toggleMouseCapture();
   public:
-    DashVis();
+    DashVis(GLFWwindow *window, impl::Text *statusTarget);
     ~DashVis();
     GLRenderTarget *build() override;
   };

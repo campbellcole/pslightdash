@@ -13,7 +13,13 @@
 static std::function<void(audio_ctx*, uint8_t*, int)> audioUpdate = [](audio_ctx*,uint8_t*, int){};
 
 namespace dash::impl {
-  DashVis::DashVis() {
+
+  void DashVis::toggleMouseCapture() {
+    this->captureEnabled = !this->captureEnabled;
+    glfwSetInputMode(this->window, GLFW_CURSOR, this->captureEnabled ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+  }
+
+  DashVis::DashVis(GLFWwindow *window, impl::Text *statusTarget) : window(window), statusTarget(statusTarget) {
     this->fft = new audiofft::AudioFFT();
     this->fft->init(SAMPLES_PER_UPDATE / 2);
     this->complexSize = audiofft::AudioFFT::ComplexSize(SAMPLES_PER_UPDATE / 2);
@@ -99,28 +105,28 @@ namespace dash::impl {
           glDrawElements(GL_TRIANGLES, this->pointShape.indexCount, GL_UNSIGNED_INT, 0);
         }
       }).withKeypressCheckFunction([this](GLFWwindow *window, float delta){
-        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
-          if ((glfwGetTime() - this->lastPlayToggle) > 1.0) {
-            if (!this->playing) {
-              debug("Playing... %x", this->render);
-              sdl_audio_set_dec(this->render, 0);
-              if (!open_dec(&this->dec, getResourcePath("test.mp3").c_str())) {
-                log_err("Failed to decode file");
-              }
-              sdl_audio_set_dec(this->render, &this->dec);
-              this->playing = true;
-            } else {
-              sdl_audio_set_dec(this->render, 0);
-              this->playing = false;
+        this->lastKeyState = this->keyState;
+        if ((this->keyState = glfwGetKey(window, GLFW_KEY_P)) == GLFW_PRESS && this->keyState != this->lastKeyState) {
+          if (!this->playing) {
+            debug("Playing...");
+            sdl_audio_set_dec(this->render, 0);
+            if (!open_dec(&this->dec, getResourcePath("test.mp3").c_str())) {
+              log_err("Failed to decode file");
             }
-            this->lastPlayToggle = glfwGetTime();
+            sdl_audio_set_dec(this->render, &this->dec);
+            this->playing = true;
+            this->statusTarget->setText("playing");
+          } else {
+            sdl_audio_set_dec(this->render, 0);
+            this->playing = false;
+            this->statusTarget->setText("paused");
           }
         }
         float movementDelta = this->CAMERA_SPEED * delta * ((glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) ? 3.0 : 1.0);
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-          this->cameraPos += movementDelta * glm::vec3(this->direction.x, 0.0, this->direction.z);
+          this->cameraPos += movementDelta * glm::vec3(fmax(this->direction.x * 1000, 1), 0.0, fmax(this->direction.z * 1000, 1));
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-          this->cameraPos -= movementDelta * glm::vec3(this->direction.x, 0.0, this->direction.z);;
+          this->cameraPos -= movementDelta * glm::vec3(fmax(this->direction.x * 1000, 1), 0.0, fmax(this->direction.z * 1000, 1));
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
           this->cameraPos += movementDelta * this->cameraUp;
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
@@ -129,7 +135,10 @@ namespace dash::impl {
           this->cameraPos -= glm::normalize(glm::cross(this->cameraFront, this->cameraUp)) * movementDelta;
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
           this->cameraPos += glm::normalize(glm::cross(this->cameraFront, this->cameraUp)) * movementDelta;
+        if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+          this->toggleMouseCapture();
       }).withMouseMovementCallback([this](GLFWwindow *window, double x, double y) {
+        if (!this->captureEnabled) return;
         this->yaw += (x - this->lastX) * this->MOUSE_SENSITIVITY;
         this->pitch += (this->lastY - y) * this->MOUSE_SENSITIVITY;
         this->lastX = x;

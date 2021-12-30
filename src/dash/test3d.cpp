@@ -15,10 +15,10 @@ namespace dash::impl {
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
         glEnableVertexAttribArray(1);
       }).withRenderData(
-        dash::primitives::TEXTURED_CUBE.vertices,
-        dash::primitives::TEXTURED_CUBE.indices,
-        dash::primitives::TEXTURED_CUBE.vertexCount,
-        dash::primitives::TEXTURED_CUBE.indexCount)
+        this->cube.vertices,
+        this->cube.indices,
+        this->cube.vertexCount,
+        this->cube.indexCount)
       .withRenderFunction([this](GLRenderTarget *target) {
         this->direction.x = cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
         this->direction.y = sin(glm::radians(this->pitch));
@@ -40,7 +40,7 @@ namespace dash::impl {
             //model = glm::rotate(model, glm::radians(cubePositions[x].w), glm::vec3(1.0f, 0.3f, 0.5f));
 
             target->getShader()->setUMat4F("model", model);
-            glDrawElements(GL_TRIANGLES, dash::primitives::TEXTURED_CUBE.indexCount, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, this->cube.indexCount, GL_UNSIGNED_INT, 0);
           }
         }
       }).withKeypressCheckFunction([this](GLFWwindow *window, float delta) {

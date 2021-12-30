@@ -74,7 +74,7 @@ namespace dash::gl {
     return *this;
   }
 
-  GLRenderTargetBuilder GLRenderTargetBuilder::withRenderData(Primitive primitive) {
+  GLRenderTargetBuilder GLRenderTargetBuilder::withRenderData(GLShape primitive) {
     return this->withRenderData(
       primitive.vertices,
       primitive.indices,

@@ -7,13 +7,15 @@ uniform float uTime;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-uniform vec2 fft;
+uniform float fft;
+uniform int pos;
 
 out vec2 texCoord;
 
 void main()
 {
   //gl_Position = vec4(aPos.x * (sin(uTime) / 2.0 + 0.5 + 1.0), aPos.y * (sin(uTime) / 2.0 + 0.5 + 1.0), aPos.z, 1.0);
-  gl_Position = projection * view * model * vec4(aPos.x, aPos.y + (fft.x / 20.0), aPos.z, 1.);
+  float newX = abs(aPos.x) > aPos.x ? aPos.x + log(pos+1) : aPos.x + log(pos+2);
+  gl_Position = projection * view * model * vec4(newX, aPos.y + max(0, fft / 40.0), aPos.z, 1.);
   texCoord = aTexCoord;
 }

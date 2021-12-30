@@ -5,8 +5,6 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "primitives/primitives.h"
-
 #include "dash/vis/audio_sdl.h"
 #include "dash/vis/decode.h"
 
@@ -17,27 +15,37 @@ static std::function<void(audio_ctx*, uint8_t*, int)> audioUpdate = [](audio_ctx
 namespace dash::impl {
   DashVis::DashVis() {
     this->fft = new audiofft::AudioFFT();
-    this->fft->init(SAMPLES_PER_UPDATE);
-    this->complexSize = audiofft::AudioFFT::ComplexSize(SAMPLES_PER_UPDATE);
+    this->fft->init(SAMPLES_PER_UPDATE / 2);
+    this->complexSize = audiofft::AudioFFT::ComplexSize(SAMPLES_PER_UPDATE / 2);
     debug("Initialized FFT with %zu samples per update and %zu frequency bands", SAMPLES_PER_UPDATE, this->complexSize - 1);
     this->re = new std::vector<float>(complexSize);
     this->im = new std::vector<float>(complexSize);
+    this->streamRight = new float[SAMPLES_PER_UPDATE / 2]{};
+    this->magnitudes = new float[complexSize]{};
     if (!sdl_audio_init(&this->render, 44100, 2, 1, 0)) {
-      log_err("Failed to initialize audio device");
+      log_err("Failed to initialize audio device");;
     }
-    audioUpdate = [this](audio_ctx *ctx, uint8_t* stream, int bytes){
+    audioUpdate = [this](audio_ctx *ctx, uint8_t stream[], int bytes){
       //auto len = bytes/sizeof(mp3d_sample_t);
-      //auto *fstream = (float*)stream;
-      this->fft->fft((float*)stream, this->re->data(), this->im->data());
+      //debug("len: %d | sizeof(float): %lu | len/so(f): %lu", bytes, sizeof(float), bytes/sizeof(float));
+      if (!stream) return;
+      auto *fstream = reinterpret_cast<float*>(stream);
+      for (size_t i = 0, r = 0; i < bytes/sizeof(mp3d_sample_t) - 1; i+=2, r++) { // take every other sample for channels and pass through Hann window
+        this->streamRight[r] = fstream[i] * powf(sinf(3.141593f * i / (SAMPLES_PER_UPDATE / 2)), 2);
+      }
+      this->fft->fft(this->streamRight, this->re->data(), this->im->data());
+      for (size_t i = 0; i < complexSize; i++) {
+        this->magnitudes[i] = 10 * log10(((*this->re)[i] * (*this->re)[i]) + ((*this->im)[i] * (*this->im)[i]));
+      }
       //debug("%d: %f %d %d %d", len, fstream[0], stream[len/2+1], stream[len/2+2], stream[len/2+3]);
     };
     sdl_set_callback([](audio_ctx *ctx, uint8_t *stream, int len) {
       audioUpdate(ctx, stream, len);
     });
-    this->model = glm::mat4(1.0f);
+    //this->model = glm::mat4(1.0f);
     this->view = glm::mat4(1.0f);
     this->projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    //model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
   }
 
@@ -47,6 +55,10 @@ namespace dash::impl {
     delete this->re;
     delete this->im;
     this->re = this->im = nullptr;
+    delete this->streamRight;
+    delete this->magnitudes;
+    this->streamRight = nullptr;
+    this->magnitudes = nullptr;
     //sdl_audio_release(&this->render); // causes sigabrt
   }
 
@@ -59,10 +71,10 @@ namespace dash::impl {
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
         glEnableVertexAttribArray(1);
       }).withRenderData(
-        dash::primitives::TEXTURED_CUBE.vertices,
-        dash::primitives::TEXTURED_CUBE.indices,
-        dash::primitives::TEXTURED_CUBE.vertexCount,
-        dash::primitives::TEXTURED_CUBE.indexCount
+        this->pointShape.vertices,
+        this->pointShape.indices,
+        this->pointShape.vertexCount,
+        this->pointShape.indexCount
       ).withRenderFunction([this](GLRenderTarget *target){
         this->direction.x = cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
         this->direction.y = sin(glm::radians(this->pitch));
@@ -76,20 +88,15 @@ namespace dash::impl {
         glBindTexture(GL_TEXTURE_2D, target->getTexture()->getTextureID());
         glBindVertexArray(target->getVAO());
 
-        for (unsigned int x = 0; x < 256; x++) {
-          //for (unsigned int z = 0; z < 10; z++) {
-            auto model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(x * 0.25, 0.0, 0.0));
-            target->getShader()->setUMat4F("model", model);
+        for (int x = 0; x < this->complexSize; x++) {
+          auto model = glm::mat4(1.0f);
+          model = glm::translate(model, glm::vec3(x * (sideLength / 2), 0.0, 0.0));
+          target->getShader()->setUMat4F("model", model);
 
-            //if (this->dec) {
-              target->getShader()->setUVec2F("fft", (*this->re)[complexSize - x],(*this->im)[x]);
-            /*} else {
-              target->getShader()->setUVec2F("fft", 0,0);
-            }*/
+          target->getShader()->setUFloat("fft", this->magnitudes[x]);
+          target->getShader()->setUInt("pos", x);
 
-            glDrawElements(GL_TRIANGLES, dash::primitives::TEXTURED_CUBE.indexCount, GL_UNSIGNED_INT, 0);
-          //}
+          glDrawElements(GL_TRIANGLES, this->pointShape.indexCount, GL_UNSIGNED_INT, 0);
         }
       }).withKeypressCheckFunction([this](GLFWwindow *window, float delta){
         if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {

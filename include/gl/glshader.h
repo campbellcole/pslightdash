@@ -36,7 +36,11 @@ namespace dash::gl {
 
     void setUBool(const std::string &name, bool value);
 
+    void setUInt(const std::string &name, int value);
+
     void setUFloat(const std::string &name, float value);
+
+    void setUFloatArr(const std::string &name, float *value, int len);
 
     void setUVec2F(const std::string &name, float x, float y);
 

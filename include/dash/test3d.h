@@ -16,6 +16,8 @@ namespace dash::impl {
   private:
     const float CAMERA_SPEED = 3.5f, MOUSE_SENSITIVITY = 0.1f;
     float lastX = 0.0f, lastY = 0.0f, pitch = 0.0f, yaw = -90.0f;
+    float sideLength = 0.0;
+    GLShape cube = primitives::TEXTURED_CUBE(1.0, sideLength);
     glm::mat4 model, view, projection;
     glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f),
       cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f),

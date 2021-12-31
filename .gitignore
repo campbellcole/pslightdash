@@ -36,3 +36,4 @@ cmake-**/**
 .idea/
 
 **/.DS_STORE
+*.mp3

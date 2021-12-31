@@ -34,3 +34,5 @@
 # CMake build output
 cmake-**/**
 .idea/
+
+**/.DS_STORE

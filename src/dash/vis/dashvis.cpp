@@ -23,12 +23,12 @@ namespace dash::impl {
 
   DashVis::DashVis(GLFWwindow *window, impl::Text *statusTarget) : window(window), statusTarget(statusTarget) {
     this->fft = new audiofft::AudioFFT();
-    this->fft->init(SAMPLES_PER_UPDATE / 2);
-    this->complexSize = audiofft::AudioFFT::ComplexSize(SAMPLES_PER_UPDATE / 2);
+    this->fft->init(SAMPLES_PER_UPDATE);
+    this->complexSize = audiofft::AudioFFT::ComplexSize(SAMPLES_PER_UPDATE);
     debug("Initialized FFT with %zu samples per update and %zu frequency bands", SAMPLES_PER_UPDATE, this->complexSize - 1);
     this->re = new std::vector<float>(complexSize);
     this->im = new std::vector<float>(complexSize);
-    this->streamRight = new float[SAMPLES_PER_UPDATE / 2]{};
+    this->streamRight = new float[SAMPLES_PER_UPDATE]{};
     this->magnitudes = new float[complexSize]{};
 
     if (!sdl_audio_init(&this->render, 44100, 2, 1, 0)) {
@@ -37,10 +37,10 @@ namespace dash::impl {
     audioUpdate = [this](audio_ctx *ctx, const uint8_t *stream, int bytes){
       if (!stream) return;
       auto *fstream = reinterpret_cast<const float*>(stream);
-      util::math::takeEvens(fstream, this->streamRight, bytes/sizeof(mp3d_sample_t), util::math::windowHann);
+      util::math::combArray(fstream, this->streamRight, bytes/sizeof(mp3d_sample_t), util::math::windowHann, 1);
       this->fft->fft(this->streamRight, this->re->data(), this->im->data());
       util::math::calculateMagnitudes(this->magnitudes, this->re->data(), this->im->data(), complexSize);
-      debug("%f %f %f %f %f", this->magnitudes[0], this->magnitudes[1], this->magnitudes[2], this->magnitudes[3], this->magnitudes[4]);
+      //debug("%f %f %f %f %f", this->magnitudes[0], this->magnitudes[1], this->magnitudes[2], this->magnitudes[3], this->magnitudes[4]);
     };
     sdl_set_callback([](audio_ctx *ctx, uint8_t *stream, int len) {
       audioUpdate(ctx, stream, len);
@@ -95,11 +95,11 @@ namespace dash::impl {
 
         for (int x = 0; x < this->complexSize; x++) {
           auto model = glm::mat4(1.0f);
-          model = glm::translate(model, glm::vec3(x * (sideLength / 2), 0.0, 0.0));
+          model = glm::translate(model, glm::vec3((x / 2) * (sideLength / 2), 0.0, x % 2));
           target->getShader()->setUMat4F("model", model);
 
           target->getShader()->setUFloat("fft", this->magnitudes[x]);
-          target->getShader()->setUInt("pos", x);
+          target->getShader()->setUInt("pos", x / 2);
 
           glDrawElements(GL_TRIANGLES, this->pointShape.indexCount, GL_UNSIGNED_INT, 0);
         }

@@ -19,8 +19,22 @@ namespace dash::util::math {
    * @param from The array to take from
    * @param to The array to store into
    * @param fromSize The size of the `from` array
+   * @param window The window function (if any) to apply to the dataset
    */
   void takeEvens(const float *from, float *to, size_t fromSize, WINDOW_FUNCTION window = nullptr);
+
+  /**
+   * Takes the `from` array, and appends every other element to the second half of `to`.
+   * <br>
+   * Example: [0, 0, 1, 1, 2, 2] -> [0, 1, 2, 0, 1, 2]
+   * @param from The array to take from
+   * @param to The array to store into
+   * @param fromSize The size of the `from` array
+   * @param window The window function (if any) to apply to the dataset using the mode `windowMode`
+   * @param windowMode How to apply the window function. 0 will set N to fromSize and run the window function on the entire array. 1 will effectively apply two window functions, joining the two halves at zero.
+   *
+   */
+  void combArray(const float *from, float *to, size_t fromSize, WINDOW_FUNCTION window = nullptr, int windowMode = 0);
 
   /**
    * Gets the value of a Hann window function at sample `n` of sample count `N`

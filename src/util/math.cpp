@@ -16,6 +16,17 @@ namespace dash::util::math {
     }
   }
 
+  void combArray(const float *from, float *to, size_t fromSize, WINDOW_FUNCTION window, int windowMode) {
+    size_t N = windowMode ? fromSize / 2 : fromSize;
+    for (size_t i = 0, l = 0, r = fromSize/2; i < fromSize; i+=2, l++, r++) {
+      to[l] = from[i] * (window != nullptr ? (*window)(windowMode ? l : i, N) : 1.0f);
+      to[r] = from[i+1] * (window != nullptr ? (*window)(windowMode ? l : (i+1), N) : 1.0f);
+      // if windowMode is 1, we want to use l because 0 <= l < fromSize / 2
+      // if windowMode is 0, we want to use i because 0 <= i < fromSize
+      // N will be either fromSize / 2 or fromSize accordingly
+    }
+  }
+
   float windowHann(unsigned int n, unsigned int N) {
     return powf(
       sinf((PI * static_cast<float>(n)) / static_cast<float>(N)), 2

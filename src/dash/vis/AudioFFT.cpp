@@ -963,7 +963,6 @@ namespace audiofft
 
     virtual void init(size_t size) override
     {
-      debug("Using Accelerate framework for FFT");
       if (_fftSetup)
       {
         vDSP_destroy_fftsetup(_fftSetup);
@@ -976,6 +975,7 @@ namespace audiofft
 
       if (size > 0)
       {
+        debug("Using Accelerate framework for FFT");
         _size = size;
         _powerOf2 = 0;
         while ((1 << _powerOf2) < _size)

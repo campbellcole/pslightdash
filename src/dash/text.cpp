@@ -23,6 +23,8 @@ namespace dash::impl {
 
         glActiveTexture(GL_TEXTURE0);
         glBindVertexArray(target->getVAO());
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, target->getEBO());
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(DEFAULT_INDICES), DEFAULT_INDICES);
 
         std::string::const_iterator c;
         for (c = this->text.begin(); c != this->text.end(); c++) {
@@ -44,8 +46,6 @@ namespace dash::impl {
           glBindTexture(GL_TEXTURE_2D, ch.textureID);
           glBindBuffer(GL_ARRAY_BUFFER, target->getVBO());
           glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-          glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, target->getEBO());
-          glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(DEFAULT_INDICES), DEFAULT_INDICES);
 
           glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
           tX += (ch.advance >> 6) * scale;

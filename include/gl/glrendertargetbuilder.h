@@ -28,7 +28,8 @@ namespace dash::gl {
     bool dynamicDraw = false;
     bool hasShader = false;
     bool hasRenderFunction = false;
-    bool hasKeypressCheckFunction = false;
+    bool hasCheckKeyPressFunction = false;
+    bool hasKeyPressCallback = false;
     bool hasMouseMovementCallback = false;
     bool hasVAOFunction = false;
     bool hasRenderData = false;
@@ -37,7 +38,8 @@ namespace dash::gl {
     unsigned int _VBO = 0, _VAO = 0, _EBO = 0;
     GLShader *_shader;
     std::function<void(GLRenderTarget*)> _render;
-    std::function<void(GLFWwindow*,float)> _checkKeypress;
+    std::function<void(GLFWwindow*,float)> _checkKeyPress;
+    std::function<void(GLFWwindow*,int,int,int,int)> _onKeyPress;
     std::function<void(GLFWwindow*,double,double)> _onMouseMove;
     std::function<void()> _registerVAO;
     float *_vertices;
@@ -51,7 +53,8 @@ namespace dash::gl {
     GLRenderTargetBuilder usingDynamicDraw(unsigned int vertexCount, unsigned int indexCount);
     GLRenderTargetBuilder withShader(GLShader *shader);
     GLRenderTargetBuilder withRenderFunction(std::function<void(GLRenderTarget*)> render);
-    GLRenderTargetBuilder withKeypressCheckFunction(std::function<void(GLFWwindow*, float)> checkKeypress);
+    GLRenderTargetBuilder withKeypressCheckFunction(std::function<void(GLFWwindow*, float)> checkKeyPress);
+    GLRenderTargetBuilder withKeypressCallback(std::function<void(GLFWwindow*,int,int,int,int)> onKeyPress);
     GLRenderTargetBuilder withMouseMovementCallback(std::function<void(GLFWwindow*,double,double)> onMouseMove);
     GLRenderTargetBuilder withVAORegisterFunction(std::function<void()> registerVAO);
     GLRenderTargetBuilder withRenderData(float *vertices, unsigned int *indices, unsigned int vertexCount, unsigned int indexCount);

@@ -47,14 +47,21 @@ namespace dash::gl {
     return *this;
   }
 
-  GLRenderTargetBuilder GLRenderTargetBuilder::withKeypressCheckFunction(std::function<void(GLFWwindow*, float)> checkKeypress) {
-    this->hasKeypressCheckFunction = true;
-    this->_checkKeypress = std::move(checkKeypress);
+  GLRenderTargetBuilder GLRenderTargetBuilder::withKeypressCheckFunction(std::function<void(GLFWwindow*, float)> checkKeyPress) {
+    this->hasCheckKeyPressFunction = true;
+    this->_checkKeyPress = std::move(checkKeyPress);
     return *this;
   }
+
+  GLRenderTargetBuilder GLRenderTargetBuilder::withKeypressCallback(std::function<void(GLFWwindow*,int,int,int,int)> onKeyPress) {
+    this->hasKeyPressCallback = true;
+    this->_onKeyPress = std::move(onKeyPress);
+    return *this;
+  }
+
   GLRenderTargetBuilder GLRenderTargetBuilder::withMouseMovementCallback(std::function<void(GLFWwindow*,double,double)> onMouseMove) {
     this->hasMouseMovementCallback = true;
-    this->_onMouseMove = onMouseMove;
+    this->_onMouseMove = std::move(onMouseMove);
     return *this;
   }
 
@@ -123,11 +130,14 @@ namespace dash::gl {
       log_err("Cannot create a target without a render function (TODO: implement defaults later)");
       return nullptr;
     }
-    if (!this->hasKeypressCheckFunction) {
-      this->_checkKeypress = [](GLFWwindow *window, float delta){};
+    if (!this->hasCheckKeyPressFunction) {
+      this->_checkKeyPress = [](GLFWwindow*,float){};
+    }
+    if (!this->hasKeyPressCallback) {
+      this->_onKeyPress = [](GLFWwindow*,int,int,int,int){};
     }
     if (!this->hasMouseMovementCallback) {
-      this->_onMouseMove = [](GLFWwindow *window, double x, double y){};
+      this->_onMouseMove = [](GLFWwindow*,double,double){};
     }
     if (!this->hasShader) { // TODO: implement default shader (with default uniforms)
       if (this->named) {
@@ -144,7 +154,7 @@ namespace dash::gl {
       }
       this->_texture = new GLTexture(this->_name);
     }
-    auto _instance = new GLRenderTarget(_name, _VBO, _VAO, _EBO, dynamicDraw, !preBuffered, _shader, _texture, _render, _checkKeypress, _onMouseMove, _vertices, _indices, _vertexCount, _indexCount);
+    auto _instance = new GLRenderTarget(_name, _VBO, _VAO, _EBO, dynamicDraw, !preBuffered, _shader, _texture, _render, _checkKeyPress, _onKeyPress, _onMouseMove, _vertices, _indices, _vertexCount, _indexCount);
     return _instance;
   }
 

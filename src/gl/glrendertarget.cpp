@@ -15,7 +15,8 @@ namespace dash::gl {
     GLShader *shader,
     GLTexture *texture,
     std::function<void(GLRenderTarget *)> render,
-    std::function<void(GLFWwindow *,float)> onInput,
+    std::function<void(GLFWwindow *,float)> checkKeyPress,
+    std::function<void(GLFWwindow*,int,int,int,int)> onKeyPress,
     std::function<void(GLFWwindow *,double,double)> onMouseMove,
     float *vertices,
     unsigned int *indices,
@@ -30,8 +31,9 @@ namespace dash::gl {
       _manageBuffers(manageBuffers),
       _shader(shader),
       _texture(texture),
-      _onInputFunc(std::move(onInput)),
-      _renderFunc(std::move(render)),
+      _checkKeyPress(std::move(checkKeyPress)),
+      _onKeyPress(std::move(onKeyPress)),
+      _render(std::move(render)),
       _onMouseMove(std::move(onMouseMove)),
       _vertices(vertices),
       _indices(indices),
@@ -84,7 +86,7 @@ namespace dash::gl {
 
   void GLRenderTarget::render(GLFWwindow *window) {
     if (this->isEnabled()) {
-      this->_renderFunc(this);
+      this->_render(this);
     }
   }
 
@@ -97,9 +99,15 @@ namespace dash::gl {
     this->render(window);
   }
 
-  void GLRenderTarget::checkKeypress(GLFWwindow *window, float delta) {
+  void GLRenderTarget::checkKeyPress(GLFWwindow *window, float delta) {
     if (this->isEnabled()) {
-      this->_onInputFunc(window, delta);
+      this->_checkKeyPress(window, delta);
+    }
+  }
+
+  void GLRenderTarget::onKeyPress(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    if (this->isEnabled()) {
+      this->_onKeyPress(window, key, scancode, action, mods);
     }
   }
 

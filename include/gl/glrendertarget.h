@@ -24,8 +24,9 @@ namespace dash::gl {
     unsigned int _VBO, _VAO, _EBO;
     GLShader *_shader;
     GLTexture *_texture;
-    std::function<void(GLRenderTarget *)> _renderFunc;
-    std::function<void(GLFWwindow *,float)> _onInputFunc;
+    std::function<void(GLRenderTarget *)> _render;
+    std::function<void(GLFWwindow *,float)> _checkKeyPress;
+    std::function<void(GLFWwindow*,int,int,int,int)> _onKeyPress;
     std::function<void(GLFWwindow *,double,double)> _onMouseMove;
     float *_vertices;
     unsigned int *_indices;
@@ -41,8 +42,9 @@ namespace dash::gl {
       GLShader *shader,
       GLTexture *texture,
       std::function<void(GLRenderTarget *)> render,
-      std::function<void(GLFWwindow *,float)> checkKeypress,
-      std::function<void(GLFWwindow *,double,double)> onMouseMove,
+      std::function<void(GLFWwindow*,float)> checkKeyPress,
+      std::function<void(GLFWwindow*,int,int,int,int)> onKeyPress,
+      std::function<void(GLFWwindow*,double,double)> onMouseMove,
       float *vertices,
       unsigned int *indices,
       unsigned int vertexCount,
@@ -66,7 +68,9 @@ namespace dash::gl {
 
     [[nodiscard]] unsigned int getEBO() const;
 
-    void checkKeypress(GLFWwindow *window, float delta);
+    void checkKeyPress(GLFWwindow *window, float delta);
+
+    void onKeyPress(GLFWwindow *window, int key, int scancode, int action, int mods);
 
     void onMouseMove(GLFWwindow *window, double x, double y);
 

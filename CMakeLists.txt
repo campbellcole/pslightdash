@@ -40,7 +40,11 @@ target_link_libraries(pslightdash PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 find_package(SDL2 CONFIG REQUIRED)
 target_link_libraries(pslightdash PRIVATE SDL2::SDL2 SDL2::SDL2main SDL2::SDL2-static)
 
-add_custom_command(TARGET pslightdash PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/res/ $<TARGET_FILE_DIR:pslightdash>/res/)
+
+#file(GLOB_RECURSE "${CMAKE_CURRENT_LIST_DIR}/res/**" ResourceFiles)
+#configure_file("${ResourceFiles}" "$<TARGET_FILE_DIR:pslightdash>/res/" COPYONLY)
+
+add_custom_command(TARGET pslightdash POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/res/ $<TARGET_FILE_DIR:pslightdash>/res/)
 
 configure_file("${CMAKE_CURRENT_LIST_DIR}/include/pslightdashconfig.h.in" "${CMAKE_CURRENT_LIST_DIR}/include/pslightdashconfig.h")
 

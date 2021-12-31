@@ -5,6 +5,8 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "util/math.h"
+
 #include "dash/vis/audio_sdl.h"
 #include "dash/vis/decode.h"
 
@@ -28,22 +30,17 @@ namespace dash::impl {
     this->im = new std::vector<float>(complexSize);
     this->streamRight = new float[SAMPLES_PER_UPDATE / 2]{};
     this->magnitudes = new float[complexSize]{};
+
     if (!sdl_audio_init(&this->render, 44100, 2, 1, 0)) {
       log_err("Failed to initialize audio device");;
     }
-    audioUpdate = [this](audio_ctx *ctx, uint8_t stream[], int bytes){
-      //auto len = bytes/sizeof(mp3d_sample_t);
-      //debug("len: %d | sizeof(float): %lu | len/so(f): %lu", bytes, sizeof(float), bytes/sizeof(float));
+    audioUpdate = [this](audio_ctx *ctx, const uint8_t *stream, int bytes){
       if (!stream) return;
-      auto *fstream = reinterpret_cast<float*>(stream);
-      for (size_t i = 0, r = 0; i < bytes/sizeof(mp3d_sample_t) - 1; i+=2, r++) { // take every other sample for channels and pass through Hann window
-        this->streamRight[r] = fstream[i] * powf(sinf(3.141593f * i / (SAMPLES_PER_UPDATE / 2)), 2);
-      }
+      auto *fstream = reinterpret_cast<const float*>(stream);
+      util::math::takeEvens(fstream, this->streamRight, bytes/sizeof(mp3d_sample_t), util::math::windowHann);
       this->fft->fft(this->streamRight, this->re->data(), this->im->data());
-      for (size_t i = 0; i < complexSize; i++) {
-        this->magnitudes[i] = 10 * log10(((*this->re)[i] * (*this->re)[i]) + ((*this->im)[i] * (*this->im)[i]));
-      }
-      //debug("%d: %f %d %d %d", len, fstream[0], stream[len/2+1], stream[len/2+2], stream[len/2+3]);
+      util::math::calculateMagnitudes(this->magnitudes, this->re->data(), this->im->data(), complexSize);
+      debug("%f %f %f %f %f", this->magnitudes[0], this->magnitudes[1], this->magnitudes[2], this->magnitudes[3], this->magnitudes[4]);
     };
     sdl_set_callback([](audio_ctx *ctx, uint8_t *stream, int len) {
       audioUpdate(ctx, stream, len);
@@ -71,7 +68,7 @@ namespace dash::impl {
   GLRenderTarget *DashVis::build() {
     GLRenderTargetBuilder builder;
     auto built = builder.withName("vis")
-      .withVAORegisterFunction([]{
+      .withVAORegisterFunction([this]{
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) 0);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
@@ -93,6 +90,8 @@ namespace dash::impl {
 
         glBindTexture(GL_TEXTURE_2D, target->getTexture()->getTextureID());
         glBindVertexArray(target->getVAO());
+        //glBindBuffer(GL_UNIFORM_BUFFER, this->FFTBuffer);
+        //glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(this->magnitudes), this->magnitudes);
 
         for (int x = 0; x < this->complexSize; x++) {
           auto model = glm::mat4(1.0f);
@@ -105,28 +104,11 @@ namespace dash::impl {
           glDrawElements(GL_TRIANGLES, this->pointShape.indexCount, GL_UNSIGNED_INT, 0);
         }
       }).withKeypressCheckFunction([this](GLFWwindow *window, float delta){
-        this->lastKeyState = this->keyState;
-        if ((this->keyState = glfwGetKey(window, GLFW_KEY_P)) == GLFW_PRESS && this->keyState != this->lastKeyState) {
-          if (!this->playing) {
-            debug("Playing...");
-            sdl_audio_set_dec(this->render, 0);
-            if (!open_dec(&this->dec, getResourcePath("test.mp3").c_str())) {
-              log_err("Failed to decode file");
-            }
-            sdl_audio_set_dec(this->render, &this->dec);
-            this->playing = true;
-            this->statusTarget->setText("playing");
-          } else {
-            sdl_audio_set_dec(this->render, 0);
-            this->playing = false;
-            this->statusTarget->setText("paused");
-          }
-        }
         float movementDelta = this->CAMERA_SPEED * delta * ((glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) ? 3.0 : 1.0);
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-          this->cameraPos += movementDelta * glm::vec3(fmax(this->direction.x * 1000, 1), 0.0, fmax(this->direction.z * 1000, 1));
+          this->cameraPos += movementDelta * this->direction;
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-          this->cameraPos -= movementDelta * glm::vec3(fmax(this->direction.x * 1000, 1), 0.0, fmax(this->direction.z * 1000, 1));
+          this->cameraPos -= movementDelta * this->direction;
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
           this->cameraPos += movementDelta * this->cameraUp;
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
@@ -135,8 +117,31 @@ namespace dash::impl {
           this->cameraPos -= glm::normalize(glm::cross(this->cameraFront, this->cameraUp)) * movementDelta;
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
           this->cameraPos += glm::normalize(glm::cross(this->cameraFront, this->cameraUp)) * movementDelta;
-        if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
-          this->toggleMouseCapture();
+      }).withKeypressCallback([this](GLFWwindow *window, int key, int scancode, int action, int mods){
+        if (action != GLFW_PRESS) return; // if GLFW_RELEASE or GLFW_REPEAT (aka holding the key), skip
+        switch (key) {
+          case GLFW_KEY_P:
+            if (!this->playing) {
+              debug("Playing...");
+              sdl_audio_set_dec(this->render, 0);
+              if (!open_dec(&this->dec, getResourcePath("test.mp3").c_str())) {
+                log_err("Failed to decode file");
+              }
+              sdl_audio_set_dec(this->render, &this->dec);
+              this->playing = true;
+              this->statusTarget->setText("playing");
+            } else {
+              sdl_audio_set_dec(this->render, 0);
+              this->playing = false;
+              this->statusTarget->setText("paused");
+            }
+            break;
+          case GLFW_KEY_M:
+            this->toggleMouseCapture();
+            break;
+          default:
+            break;
+        }
       }).withMouseMovementCallback([this](GLFWwindow *window, double x, double y) {
         if (!this->captureEnabled) return;
         this->yaw += (x - this->lastX) * this->MOUSE_SENSITIVITY;

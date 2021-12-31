@@ -6,6 +6,7 @@
 #define PSLIGHTDASH_DASHVIS_H
 
 #include <vector>
+#include <map>
 
 #include "dash/vis/AudioFFT.h"
 
@@ -23,14 +24,14 @@ namespace dash::impl {
   class DashVis: public BaseRenderTarget {
   private:
     GLFWwindow *window;
+    std::map<int, int> lastPressStates{};
     impl::Text *statusTarget;
     audiofft::AudioFFT *fft;
     bool playing = false;
     void *render;
     decoder dec;
-    int lastKeyState = GLFW_RELEASE, keyState = GLFW_RELEASE;
     float sideLength = 0.0;
-    GLShape pointShape = primitives::TEXTURED_CUBE(0.01, sideLength);
+    GLShape pointShape = primitives::TEXTURED_CUBE(0.1, sideLength);
     const float CAMERA_SPEED = 3.5f, MOUSE_SENSITIVITY = 0.1f;
     static const size_t SAMPLES_PER_UPDATE = 16384 / 2;
     size_t complexSize;

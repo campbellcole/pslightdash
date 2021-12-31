@@ -34,6 +34,9 @@ namespace dash::gl {
     static void _handleResize(GLFWwindow *window, int width, int height);
 
     static void _handleMouseMove(GLFWwindow *window, double x, double y);
+
+    static void _handleKeyPress(GLFWwindow *window, int key, int scancode, int action, int mods);
+
   public:
     GLContext(unsigned int width, unsigned int height);
 
@@ -50,6 +53,8 @@ namespace dash::gl {
     void handleResize(GLFWwindow *window, int width, int height);
 
     void handleMouseMove(GLFWwindow *window, double x, double y);
+
+    void handleKeyPress(GLFWwindow *window, int key, int scancode, int action, int mods);
 
     unsigned int getWidth() const;
 

@@ -35,6 +35,7 @@ namespace dash::gl {
     glfwSetFramebufferSizeCallback(window, GLContext::_handleResize);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, GLContext::_handleMouseMove);
+    glfwSetKeyCallback(window, GLContext::_handleKeyPress);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(0); // uncomment to disable vsync
@@ -122,6 +123,18 @@ namespace dash::gl {
     }
   }
 
+  void GLContext::_handleKeyPress(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    ((GLContext *) glfwGetWindowUserPointer(window))->handleKeyPress(window, key, scancode, action, mods);
+  }
+
+  void GLContext::handleKeyPress(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    for (auto [_, targets] : this->_targetsByShader) {
+      for (auto target : *targets) {
+        target->onKeyPress(window, key, scancode, action, mods);
+      }
+    }
+  }
+
   void GLContext::start() {
     int frameCount = 0;
     double prevTime = 0.0;
@@ -152,7 +165,7 @@ namespace dash::gl {
         GLShader::setDefaultUniforms(targets.first, glm::vec2(this->getWidth(), this->getHeight()));
         if (!targets.second) continue;
         for (auto target : *targets.second) {
-          target->checkKeypress(this->window, frameDelta);
+          target->checkKeyPress(this->window, frameDelta);
           target->render(this->window);
         }
       }

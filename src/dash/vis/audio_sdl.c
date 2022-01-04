@@ -1,6 +1,8 @@
 #include <stddef.h>
 #include <stdlib.h>
+#ifndef _MSC_VER
 #include <sys/param.h>
+#endif
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>

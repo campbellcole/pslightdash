@@ -33,9 +33,14 @@ namespace dash::impl {
     float sideLength = 0.0;
     GLShape pointShape = primitives::TEXTURED_CUBE(0.1, sideLength);
     const float CAMERA_SPEED = 3.5f, MOUSE_SENSITIVITY = 0.1f;
-    static const size_t SAMPLES_PER_UPDATE = 16384 / 2;
+    int SAMPLES_PER_UPDATE;
+    int WORKING_SAMPLES;
     size_t complexSize;
-    float *streamRight, *magnitudes;
+    float **buffers;
+    float *workingBuffer;
+    int bufferLens[2] = {0,0};
+    size_t currentBuffer = 0;
+    float *magnitudes;
     float lastX = 0.0f, lastY = 0.0f, pitch = 0.0f, yaw = -90.0f;
     glm::mat4 /*model,*/ view, projection;
     glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f),

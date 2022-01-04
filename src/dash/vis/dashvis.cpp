@@ -22,27 +22,47 @@ namespace dash::impl {
   }
 
   DashVis::DashVis(GLFWwindow *window, impl::Text *statusTarget) : window(window), statusTarget(statusTarget) {
-    this->fft = new audiofft::AudioFFT();
-    this->fft->init(SAMPLES_PER_UPDATE);
-    this->complexSize = audiofft::AudioFFT::ComplexSize(SAMPLES_PER_UPDATE);
-    debug("Initialized FFT with %zu samples per update and %zu frequency bands", SAMPLES_PER_UPDATE, this->complexSize - 1);
-    this->re = new std::vector<float>(complexSize);
-    this->im = new std::vector<float>(complexSize);
-    this->streamRight = new float[SAMPLES_PER_UPDATE]{};
-    this->magnitudes = new float[complexSize]{};
-
-    if (!sdl_audio_init(&this->render, 44100, 2, 1, 0)) {
+    if (!sdl_audio_init(&this->render, 44100, 2, 1, SAMPLES_PER_UPDATE)) {
       log_err("Failed to initialize audio device");;
     }
+    this->SAMPLES_PER_UPDATE = 8192;
+    this->WORKING_SAMPLES = SAMPLES_PER_UPDATE / 2;
+    debug("About to attempt using sample rate %d", this->WORKING_SAMPLES);
+    this->fft = new audiofft::AudioFFT();
+    this->fft->init(WORKING_SAMPLES);
+    this->complexSize = audiofft::AudioFFT::ComplexSize(WORKING_SAMPLES);
+    debug("Initialized FFT with %d samples per update and %zu frequency bands", WORKING_SAMPLES, this->complexSize);
+    this->re = new std::vector<float>(complexSize);
+    this->im = new std::vector<float>(complexSize);
+    this->buffers = new float*[2]{
+      new float[WORKING_SAMPLES]{0},
+      new float[WORKING_SAMPLES]{0}
+    };
+    this->workingBuffer = new float[this->WORKING_SAMPLES]{0};
+    this->magnitudes = new float[complexSize]{0};
     audioUpdate = [this](audio_ctx *ctx, const uint8_t *stream, int bytes){
+      //debug("bytes: %d | adjusted: %llu", bytes, bytes/sizeof(mp3d_sample_t));
       if (!stream) return;
+      int len = bytes/sizeof(mp3d_sample_t);
       auto *fstream = reinterpret_cast<const float*>(stream);
-      util::math::combArray(fstream, this->streamRight, bytes/sizeof(mp3d_sample_t), util::math::windowHann, 1);
-      this->fft->fft(this->streamRight, this->re->data(), this->im->data());
-      util::math::calculateMagnitudes(this->magnitudes, this->re->data(), this->im->data(), complexSize);
+      int toAdd = min(WORKING_SAMPLES - this->bufferLens[this->currentBuffer], len);
+      int excess = len - toAdd;
+      ::memcpy(this->buffers[this->currentBuffer] + this->bufferLens[this->currentBuffer], fstream, toAdd);
+      this->bufferLens[this->currentBuffer] += toAdd;
+      if (excess > 0) {
+        util::math::takeEvens(this->buffers[this->currentBuffer], this->workingBuffer, WORKING_SAMPLES, util::math::windowHann);
+        //util::math::combArray(this->buffers[this->currentBuffer], this->workingBuffer, WORKING_SAMPLES, util::math::windowHann, 1);
+        this->fft->fft(this->workingBuffer, this->re->data(), this->im->data());
+        util::math::calculateMagnitudes(this->magnitudes, this->re->data(), this->im->data(), complexSize);
+        this->bufferLens[this->currentBuffer] = 0;
+        std::fill(this->buffers[this->currentBuffer], this->buffers[this->currentBuffer] + WORKING_SAMPLES, 0);
+        this->currentBuffer = !this->currentBuffer;
+        ::memcpy(this->buffers[this->currentBuffer], fstream, excess);
+        this->bufferLens[this->currentBuffer] += excess;
+      }
       //debug("%f %f %f %f %f", this->magnitudes[0], this->magnitudes[1], this->magnitudes[2], this->magnitudes[3], this->magnitudes[4]);
     };
-    sdl_set_callback([](audio_ctx *ctx, uint8_t *stream, int len) {
+    sdl_set_callback([](audio_ctx *ctx, uint8_t *stream, int len) { // i have to do this roundabout method because C doesn't support captures
       audioUpdate(ctx, stream, len);
     });
     //this->model = glm::mat4(1.0f);
@@ -58,9 +78,12 @@ namespace dash::impl {
     delete this->re;
     delete this->im;
     this->re = this->im = nullptr;
-    delete this->streamRight;
-    delete this->magnitudes;
-    this->streamRight = nullptr;
+    delete[] this->buffers[0];
+    delete[] this->buffers[1];
+    delete[] this->buffers;
+    delete[] this->workingBuffer;
+    delete[] this->magnitudes;
+    this->buffers = nullptr;
     this->magnitudes = nullptr;
     //sdl_audio_release(&this->render); // causes sigabrt
   }
@@ -87,6 +110,7 @@ namespace dash::impl {
 
         target->getShader()->setUMat4F("view", this->view);
         target->getShader()->setUMat4F("projection", this->projection);
+        target->getShader()->setUInt("bands", this->complexSize);
 
         glBindTexture(GL_TEXTURE_2D, target->getTexture()->getTextureID());
         glBindVertexArray(target->getVAO());
@@ -95,11 +119,11 @@ namespace dash::impl {
 
         for (int x = 0; x < this->complexSize; x++) {
           auto model = glm::mat4(1.0f);
-          model = glm::translate(model, glm::vec3((x / 2) * (sideLength / 2), 0.0, x % 2));
+          model = glm::translate(model, glm::vec3(0.0, 1.0, 0.0));
           target->getShader()->setUMat4F("model", model);
 
           target->getShader()->setUFloat("fft", this->magnitudes[x]);
-          target->getShader()->setUInt("pos", x / 2);
+          target->getShader()->setUInt("pos", x);
 
           glDrawElements(GL_TRIANGLES, this->pointShape.indexCount, GL_UNSIGNED_INT, 0);
         }

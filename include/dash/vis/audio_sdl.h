@@ -6,6 +6,7 @@
 #define PSLIGHTDASH_AUDIO_SDL_H
 
 #include "decode.h"
+#define SDL_MAIN_HANDLED // SDL tries to convert main() into WinMain() smh
 #include <SDL2/SDL.h>
 #ifdef __cplusplus
 extern "C" {

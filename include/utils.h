@@ -20,6 +20,14 @@
 
 #include <string>
 
+#define delnptr(ptr) \
+delete ptr; \
+ptr = nullptr;
+
+#define delanptr(ptr) \
+delete[] ptr; \
+ptr = nullptr;
+
 std::string getResourcePath(const std::string &filename);
 
 #endif //PSLIGHTDASH_UTILS_H

@@ -13,8 +13,7 @@
 #include "dash/baserendertarget.h"
 #include "dash/text.h"
 
-#include "dash/vis/decode.h"
-#include "dash/vis/audio_sdl.h"
+#include "dash/vis/dashfft.h"
 
 #include "primitives/primitives.h"
 
@@ -26,21 +25,11 @@ namespace dash::impl {
     GLFWwindow *window;
     std::map<int, int> lastPressStates{};
     impl::Text *statusTarget;
-    audiofft::AudioFFT *fft;
-    bool playing = false;
-    void *render;
-    decoder dec;
+    impl::DashFFT *fft;
+    size_t magnitudesLen = 0;
     float sideLength = 0.0;
     GLShape pointShape = primitives::TEXTURED_CUBE(0.1, sideLength);
     const float CAMERA_SPEED = 3.5f, MOUSE_SENSITIVITY = 0.1f;
-    int SAMPLES_PER_UPDATE;
-    int WORKING_SAMPLES;
-    size_t complexSize;
-    float **buffers;
-    float *workingBuffer;
-    int bufferLens[2] = {0,0};
-    size_t currentBuffer = 0;
-    float *magnitudes;
     float lastX = 0.0f, lastY = 0.0f, pitch = 0.0f, yaw = -90.0f;
     glm::mat4 /*model,*/ view, projection;
     glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f),
@@ -51,7 +40,6 @@ namespace dash::impl {
       cameraUp = glm::cross(cameraDirection, cameraRight),
       cameraFront = glm::vec3(0.0f, 0.0f, -1.0f),
       direction = glm::vec3(0.0f, 0.0f, 0.0f);
-    std::vector<float> *re, *im = re = nullptr;
     bool captureEnabled = true;
     void toggleMouseCapture();
   public:

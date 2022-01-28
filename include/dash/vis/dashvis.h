@@ -33,8 +33,9 @@ namespace dash::impl {
     float sideLength = 0.0;
     GLShape pointShape = primitives::TEXTURED_CUBE(0.1, sideLength);
     const float CAMERA_SPEED = 3.5f, MOUSE_SENSITIVITY = 0.1f;
-    int SAMPLES_PER_UPDATE;
-    int WORKING_SAMPLES;
+    int channels;
+    int samplesPerUpdate;
+    int workingSamples;
     size_t complexSize;
     float **buffers;
     float *workingBuffer;

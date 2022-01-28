@@ -10,8 +10,8 @@
 
 namespace dash::util::math {
 
-  void takeEvens(const float *from, float *to, size_t fromSize, WINDOW_FUNCTION window) {
-    for (size_t i = 0, t = 0; i < fromSize; i+=2, t++) {
+  void takeEvens(const float *from, float *to, size_t fromSize, unsigned int step, WINDOW_FUNCTION window) {
+    for (size_t i = 0, t = 0; i < fromSize; i+=step, t++) {
       to[t] = from[i] * (window != nullptr ? (*window)(i, fromSize) : 1.0f);
     }
   }

@@ -21,7 +21,7 @@ namespace dash::util::math {
    * @param fromSize The size of the `from` array
    * @param window The window function (if any) to apply to the dataset
    */
-  void takeEvens(const float *from, float *to, size_t fromSize, WINDOW_FUNCTION window = nullptr);
+  void takeEvens(const float *from, float *to, size_t fromSize, unsigned int step = 2, WINDOW_FUNCTION window = nullptr);
 
   /**
    * Takes the `from` array, and appends every other element to the second half of `to`.

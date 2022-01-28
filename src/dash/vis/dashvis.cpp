@@ -22,40 +22,42 @@ namespace dash::impl {
   }
 
   DashVis::DashVis(GLFWwindow *window, impl::Text *statusTarget) : window(window), statusTarget(statusTarget) {
-    if (!sdl_audio_init(&this->render, 44100, 2, 1, SAMPLES_PER_UPDATE)) {
-      log_err("Failed to initialize audio device");;
+    if (!sdl_audio_init(&this->render, 44100, 0, 1, samplesPerUpdate)) {
+      log_err("Failed to initialize audio device");
     }
-    this->SAMPLES_PER_UPDATE = 8192;
-    this->WORKING_SAMPLES = SAMPLES_PER_UPDATE / 2;
-    debug("About to attempt using sample rate %d", this->WORKING_SAMPLES);
+    this->channels = ((audio_ctx*)this->render)->outputSpec.channels;
+    debug("freq: %d", ((audio_ctx*)this->render)->outputSpec.freq);
+    this->samplesPerUpdate = 8192 * this->channels;
+    this->workingSamples = samplesPerUpdate / this->channels;
+    debug("About to attempt using sample rate %d", this->workingSamples);
     this->fft = new audiofft::AudioFFT();
-    this->fft->init(WORKING_SAMPLES);
-    this->complexSize = audiofft::AudioFFT::ComplexSize(WORKING_SAMPLES);
-    debug("Initialized FFT with %d samples per update and %zu frequency bands", WORKING_SAMPLES, this->complexSize);
+    this->fft->init(workingSamples);
+    this->complexSize = audiofft::AudioFFT::ComplexSize(workingSamples);
+    debug("Initialized FFT with %d samples per update and %zu frequency bands", workingSamples, this->complexSize);
     this->re = new std::vector<float>(complexSize);
     this->im = new std::vector<float>(complexSize);
     this->buffers = new float*[2]{
-      new float[WORKING_SAMPLES]{0},
-      new float[WORKING_SAMPLES]{0}
+      new float[workingSamples]{0},
+      new float[workingSamples]{0}
     };
-    this->workingBuffer = new float[this->WORKING_SAMPLES]{0};
+    this->workingBuffer = new float[this->workingSamples]{0};
     this->magnitudes = new float[complexSize]{0};
     audioUpdate = [this](audio_ctx *ctx, const uint8_t *stream, int bytes){
       //debug("bytes: %d | adjusted: %llu", bytes, bytes/sizeof(mp3d_sample_t));
       if (!stream) return;
       int len = bytes/sizeof(mp3d_sample_t);
       auto *fstream = reinterpret_cast<const float*>(stream);
-      int toAdd = min(WORKING_SAMPLES - this->bufferLens[this->currentBuffer], len);
+      int toAdd = min(workingSamples - this->bufferLens[this->currentBuffer], len);
       int excess = len - toAdd;
       ::memcpy(this->buffers[this->currentBuffer] + this->bufferLens[this->currentBuffer], fstream, toAdd);
       this->bufferLens[this->currentBuffer] += toAdd;
       if (excess > 0) {
-        util::math::takeEvens(this->buffers[this->currentBuffer], this->workingBuffer, WORKING_SAMPLES, util::math::windowHann);
-        //util::math::combArray(this->buffers[this->currentBuffer], this->workingBuffer, WORKING_SAMPLES, util::math::windowHann, 1);
+        util::math::takeEvens(this->buffers[this->currentBuffer], this->workingBuffer, this->channels, workingSamples, util::math::windowHann);
+        //util::math::combArray(this->buffers[this->currentBuffer], this->workingBuffer, workingSamples, util::math::windowHann, 1);
         this->fft->fft(this->workingBuffer, this->re->data(), this->im->data());
         util::math::calculateMagnitudes(this->magnitudes, this->re->data(), this->im->data(), complexSize);
         this->bufferLens[this->currentBuffer] = 0;
-        std::fill(this->buffers[this->currentBuffer], this->buffers[this->currentBuffer] + WORKING_SAMPLES, 0);
+        std::fill(this->buffers[this->currentBuffer], this->buffers[this->currentBuffer] + workingSamples, 0);
         this->currentBuffer = !this->currentBuffer;
         ::memcpy(this->buffers[this->currentBuffer], fstream, excess);
         this->bufferLens[this->currentBuffer] += excess;

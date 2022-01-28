@@ -17,7 +17,8 @@ out vec2 texCoord;
 
 float scaleFFT() {
   if (abs(aPos.y) > aPos.y) return 0.0;
-  float scaledFFT = min(sqrt(2 * (float(pos)/float(bands))) + 0.7, 2) * fft;
+  float scaledFFT = min(pow(100 * (float(pos)/float(bands)), 1.0 / 15.0), 1) * fft;
+  //float scaledFFT = min(sqrt(2 * (float(pos)/float(bands))) + 1.0, 1) * fft;
   float scale = aPos.y + scaledFFT / 50;
   //scale += pow(scale, 2.0);
   return scale;
